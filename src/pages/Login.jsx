@@ -11,6 +11,7 @@ import {
 import logo from "../assets/images/logo.png";
 import qr from "../assets/images/qr.png";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CustomTabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -41,9 +42,14 @@ const a11yProps = (index) => {
 
 const Login = () => {
   const [value, setValue] = useState(0);
+  const navigate = useNavigate();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleLogin = () => {
+    navigate("/home");
   };
   return (
     <Container maxWidth="xl">
@@ -73,29 +79,11 @@ const Login = () => {
             }}
           >
             <Tabs value={value} onChange={handleChange}>
-              <Tab label="VỚI MÃ QR" {...a11yProps(0)} sx={{ width: "50%" }} />
-              <Tab
-                label="VỚI SỐ ĐIỆN THOẠI"
-                {...a11yProps(1)}
-                sx={{ width: "50%" }}
-              />
+              <Tab label="ĐĂNG NHẬP" {...a11yProps(0)} sx={{ width: "50%" }} />
+              <Tab label="ĐĂNG KÝ" {...a11yProps(1)} sx={{ width: "50%" }} />
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
-            <img
-              src={qr}
-              width="100%"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            />
-            <Typography color="gray" textAlign="center">
-              Sử dụng ứng dụng Zalo để quét mã QR
-            </Typography>
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
             <TextField
               id="phoneNumber"
               label="Số điện thoại"
@@ -106,25 +94,59 @@ const Login = () => {
             <TextField
               id="password"
               label="Mật khẩu"
+              type="password"
               variant="standard"
               fullWidth
               style={{ marginBottom: "20px" }}
             />
-            <Button variant="contained" fullWidth style={{ margin: "20px 0" }}>
-              Đăng nhập với mật khẩu
-            </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               fullWidth
-              style={{ marginBottom: "40px" }}
+              style={{ margin: "20px 0" }}
+              onClick={handleLogin}
             >
-              Đăng nhập bằng thiết bị di động
+              Đăng nhập với mật khẩu
             </Button>
             <Box textAlign="center">
               <Link href="#" textAlign="center" color="#000">
                 Quên mật khẩu?
               </Link>
             </Box>
+          </CustomTabPanel>
+          <CustomTabPanel value={value} index={1}>
+            <TextField
+              id="fullName"
+              label="Họ và tên"
+              variant="standard"
+              fullWidth
+              style={{ marginBottom: "20px" }}
+            />
+            <TextField
+              id="phoneNumber"
+              label="Số điện thoại"
+              variant="standard"
+              fullWidth
+              style={{ marginBottom: "20px" }}
+            />
+            <TextField
+              id="password"
+              label="Mật khẩu"
+              type="password"
+              variant="standard"
+              fullWidth
+              style={{ marginBottom: "20px" }}
+            />
+            <TextField
+              id="rePassword"
+              label="Nhập lại mật khẩu"
+              type="password"
+              variant="standard"
+              fullWidth
+              style={{ marginBottom: "20px" }}
+            />
+            <Button variant="contained" fullWidth style={{ margin: "20px 0" }}>
+              Đăng ký tài khoản
+            </Button>
           </CustomTabPanel>
         </Box>
       </Box>
