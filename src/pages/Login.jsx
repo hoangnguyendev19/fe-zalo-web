@@ -9,7 +9,7 @@ import {
   Link,
 } from "@mui/material";
 import logo from "../assets/images/logo.png";
-import qr from "../assets/images/qr.png";
+// import qr from "../assets/images/qr.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
