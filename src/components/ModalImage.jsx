@@ -1,4 +1,4 @@
-import { Modal, Box } from "@mui/material";
+import { Modal, Box, Avatar } from "@mui/material";
 import { useState } from "react";
 import { styled } from "@mui/material/styles";
 
@@ -19,25 +19,31 @@ const StyledModal = styled(Modal)(({ theme }) => ({
   "& .MuiModal-dialog": {
     margin: 0,
     position: "absolute",
-    width: 400,
+    width: '100%',
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
   },
 }));
 
-export default function ModalImage({ open, handleCloseImage, children }) {
-//   const [open, setOpen] = useState(false);
-//   const handleOpen = () => setOpen(true);
-//   const handleClose = () => setOpen(false);
+export default function ModalImage({isImage ,src, styleOrigin,children }) {
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
-    <StyledModal
-      open={open}
-      onClose={handleCloseImage}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={style}>{children}</Box>
-    </StyledModal>
+    <>
+      {isImage ? <img src={src} alt="modal" onClick={handleOpen} style={styleOrigin}/> : <Avatar src={src} onClick={handleOpen} style={styleOrigin}/> }
+      <StyledModal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {children}
+        </Box>
+      </StyledModal>
+    </>
   );
 }

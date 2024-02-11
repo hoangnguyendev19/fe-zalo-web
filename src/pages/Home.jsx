@@ -127,12 +127,7 @@ const Home = () => {
                     }}
                   >
                     <List>
-                      <ListItem sx={{ padding: "0px" }} onClick={() => {
-                        // get element popover when click on Profile
-                        const element = document.getElementById(id);
-                        // hiden popover
-                        element.style.display = 'none';
-                      }} >
+                      <ListItem sx={{ padding: "0px" }}  >
                         <Profile/>
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
@@ -153,13 +148,7 @@ const Home = () => {
                       </ListItem>
                     </List>
                   </Popover>
-                  <ListItemButton aria-describedby={id} onClick={() => {
-                    // get element popover when click on Profile
-                    const element = document.getElementById(id);
-                    // show popover
-                    element.style.display = 'block';
-                    handleClick();
-                    }}>
+                      <ListItemButton aria-describedby={id} onClick={handleClick}>
                     <SettingsIcon sx={{ color: "#fff" }} />
                   </ListItemButton>
                 </ListItemIcon>
