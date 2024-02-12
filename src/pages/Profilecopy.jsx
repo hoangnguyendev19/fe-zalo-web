@@ -35,7 +35,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  height: "70vh",
+  height: "60vh",
   bgcolor: "background.paper",
   // border: "2px solid #000",
   boxShadow: 24,
@@ -64,7 +64,10 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 export default function Profile() {
   const [openModal, setOpenModal] = useState(false);
   // const [openImage, setOpenImage] = useState(false);
-  const handleOpenModal = () => {changeBody('default'); setOpenModal(true); }
+  const handleOpenModal = () => {
+    changeBody("default");
+    setOpenModal(true);
+  };
   const handleCloseModal = () => setOpenModal(false);
   const [body, setBody] = useState("default");
   const changeBody = (body) => {
@@ -119,6 +122,12 @@ export default function Profile() {
           )}
           {body === "image_uploader" && (
             <ImageUploader
+              changeBody={changeBody}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
+          {body === "info_edit" && (
+            <InfoEdit
               changeBody={changeBody}
               handleCloseModal={handleCloseModal}
             />
@@ -201,7 +210,10 @@ function InfoBody({ changeBody, handleCloseModal }) {
         <Typography variant="h6" component="h2" fontWeight={"bold"}>
           Đăng Quang
         </Typography>
-        <IconButton sx={{ minWidth: 0, padding: 0 }}>
+        <IconButton
+          sx={{ minWidth: 0, padding: 0 }}
+          onClick={() => changeBody("info_edit")}
+        >
           <BorderColorOutlinedIcon sx={{ color: "#000" }} />
         </IconButton>
       </Box>
@@ -302,6 +314,7 @@ function InfoBody({ changeBody, handleCloseModal }) {
           color: "black",
           textTransform: "none",
         }}
+        onClick={() => changeBody('info_edit')}
       >
         <BorderColorOutlinedIcon fontSize="medium" />
         <Typography variant="h6" component="h2" fontWeight={"medium"}>
@@ -346,132 +359,17 @@ function AvatarHome({ changeBody, handleCloseModal }) {
         </Box>
         <Box>
           <ImageUploader
-              changeBody={changeBody}
-              handleCloseModal={handleCloseModal}
-            />
-          
+            changeBody={changeBody}
+            handleCloseModal={handleCloseModal}
+          />
         </Box>
         {/* <Button onClick={handleClose}>Close Child Modal</Button> */}
       </Box>
     </>
   );
 }
-function InformationModal() {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  return (
-    <>
-      <Button onClick={handleOpen}>Open Child Modal</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
-      >
-        <Box sx={{ ...style }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              // marginLeft: "10px",
-              marginBottom: "10px",
-              marginTop: "10px",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "start",
-                alignItems: "center",
-              }}
-            >
-              <IconButton onClick={handleClose}>
-                <ArrowBackIosNewOutlinedIcon />
-              </IconButton>
-              <Typography variant="h6" component="h2" fontWeight={"bold"}>
-                Cập nhật thông tin cá nhân
-              </Typography>
-            </Box>
-            <IconButton onClick={handleClose} sx={{ color: "black" }}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          {/* <h2 id="child-modal-title">Text in a child modal</h2>
-          <p id="child-modal-description">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-          </p> */}
-          <Button onClick={handleClose}>Close Child Modal</Button>
-        </Box>
-      </Modal>
-    </>
-  );
-}
-function GroupModal() {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  return (
-    <>
-      <Button onClick={handleOpen}>Open Child Modal</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
-      >
-        <Box sx={{ ...style }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              // marginLeft: "10px",
-              marginBottom: "10px",
-              marginTop: "10px",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "start",
-                alignItems: "center",
-              }}
-            >
-              <IconButton onClick={handleClose}>
-                <ArrowBackIosNewOutlinedIcon />
-              </IconButton>
-              <Typography variant="h6" component="h2" fontWeight={"bold"}>
-                Nhóm chung
-              </Typography>
-            </Box>
-            <IconButton onClick={handleClose} sx={{ color: "black" }}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <h2 id="child-modal-title">Text in a child modal</h2>
-          <p id="child-modal-description">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-          </p>
-          <Button onClick={handleClose}>Close Child Modal</Button>
-        </Box>
-      </Modal>
-    </>
-  );
-}
 function ImageUploader({ changeBody, handleCloseModal }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); // Hiển thị
   const [image, setImage] = useState(null);
   const inputRef = useRef();
   const canvasRef = useRef();
@@ -567,7 +465,12 @@ function ImageUploader({ changeBody, handleCloseModal }) {
                   alignItems: "center",
                 }}
               >
-                <IconButton onClick={() => {changeBody("avatar_editor"); setOpen(false);}}>
+                <IconButton
+                  onClick={() => {
+                    changeBody("avatar_editor");
+                    setOpen(false);
+                  }}
+                >
                   <ArrowBackIosNewOutlinedIcon />
                 </IconButton>
                 <Typography variant="h6" component="h2" fontWeight={"bold"}>
@@ -640,7 +543,9 @@ function ImageUploader({ changeBody, handleCloseModal }) {
               Huỷ
             </button>
             <button
-              onClick={() => {setOpen(false); }}
+              onClick={() => {
+                setOpen(false);
+              }}
               style={{
                 backgroundColor: "#0068FF",
                 color: "white",
@@ -656,4 +561,179 @@ function ImageUploader({ changeBody, handleCloseModal }) {
       )}
     </Box>
   );
+}
+function InfoEdit({ changeBody, handleCloseModal }) {
+  const [value, setValue] = useState("Đăng Quang");
+  const [checked, setChecked] = useState(true);
+  const [date, setDate] = useState("2022-01-01");
+
+  const handleChangeDate = (event) => {
+    setDate(event.target.value);
+  };
+  const handleChangeGender = (event) => {
+    setChecked(event.target.checked);
+  };
+  const handleChangeName = (event) => {
+    setValue(event.target.value);
+  };
+  return (
+    <Box sx={{ ...style }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "10px",
+          marginTop: "10px",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "start",
+            alignItems: "center",
+          }}
+        >
+          <IconButton
+            onClick={() => {
+              changeBody("default");
+            }}
+          >
+            <ArrowBackIosNewOutlinedIcon />
+          </IconButton>
+          <Typography variant="h6" component="h2" fontWeight={"bold"}>
+            Cập nhật thông tin cá nhân
+          </Typography>
+        </Box>
+        <IconButton onClick={handleCloseModal} sx={{ color: "black" }}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          height: "87%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            padding: "10px",
+          }}
+        >
+          <Box>
+            <Typography>Tên hiển thị</Typography>
+            <input
+              type="text"
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #A0A0A0",
+                boxSizing: "border-box",
+              }}
+              value={value}
+              onChange={handleChangeName}
+            />
+          </Box>
+          <Box>
+            <Typography variant="h6" component="h2" fontWeight={"bold"}>
+              Giới tính
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "left",
+                alignItems: "center",
+                gap: "30px",
+                marginY: "10px",
+              }}
+            >
+              <div>
+                <input
+                  type="radio"
+                  id="nam"
+                  name="gt"
+                  value="Nam"
+                  checked={checked}
+                  onChange={handleChangeGender}
+                />
+                <label htmlFor="nam">Nam</label>
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  id="nu"
+                  name="gt"
+                  value="Nữ"
+                  onChange={handleChangeGender}
+                />
+                <label htmlFor="nu">Nữ</label>
+              </div>
+            </Box>
+          </Box>
+          <Box>
+            <Typography>Ngày sinh</Typography>
+            <input
+              type="date"
+              style={{
+                minWidth: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #A0A0A0",
+                boxSizing: "border-box",
+              }}
+              value={date}
+              onChange={handleChangeDate}
+            />
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "right",
+            alignItems: "center",
+            marginTop: "30px",
+            gap: "10px",
+            marginRight: "10px",
+          }}
+        >
+          <button
+            style={{
+              backgroundColor: "#EAEDF0",
+              color: "#38485B",
+              fontSize: "1.2rem",
+              border: "none",
+              padding: "8px 16px",
+            }}
+            onClick={() => changeBody("default")}
+          >
+            Huỷ
+          </button>
+          <button
+            onClick={() => {
+              changeBody("default");
+            }}
+            style={{
+              backgroundColor: "#0068FF",
+              color: "white",
+              fontSize: "1.2rem",
+              border: "none",
+              padding: "8px 16px",
+            }}
+          >
+            Cập nhật
+          </button>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+function CommonGroup() {
+  
 }
