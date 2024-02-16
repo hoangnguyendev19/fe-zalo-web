@@ -1,4 +1,5 @@
 import {
+  styled,
   Modal,
   Button,
   IconButton,
@@ -13,8 +14,10 @@ import {
   Grid,
   ImageList,
   ImageListItem,
-  ImageListItemBar,
+  AvatarGroup,
+  Slider,
 } from "@mui/material";
+
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import CameraEnhanceOutlinedIcon from "@mui/icons-material/CameraEnhanceOutlined";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,56 +27,39 @@ import BlockOutlinedIcon from "@mui/icons-material/BlockOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import Slider from '@mui/material/Slider';
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ModalImage from "../components/ModalImage";
+
 import { useEffect, useState, useRef, memo } from "react";
-import { styled } from "@mui/material/styles";
 import AvatarEditor from "react-avatar-editor";
+import { request } from "http";
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  height: "70vh",
+  height: "60vh",
   bgcolor: "background.paper",
   // border: "2px solid #000",
   boxShadow: 24,
   overflowY: "auto",
   p: 0,
 };
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      // animation: 'ripple 1.2s infinite ease-in-out',
-      border: "1px solid currentColor",
-      content: '""',
-    },
-  },
-}));
 
 export default function Profile() {
   const [openModal, setOpenModal] = useState(false);
   // const [openImage, setOpenImage] = useState(false);
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
-
-  const hadleImgModal = (isOpen) => {
-    if (isOpen) {
-      setOpenModal(true);
-    } else {
-      setOpenModal(false);
-    }
+  const handleOpenModal = () => {
+    changeBody("default");
+    setOpenModal(true);
   };
+  const handleCloseModal = () => setOpenModal(false);
+  const [body, setBody] = useState("default");
+  const changeBody = (body) => {
+    setBody(body);
+  };
+
   return (
     <div>
       <ListItemButton onClick={handleOpenModal}>
@@ -90,569 +76,316 @@ export default function Profile() {
         aria-describedby="keep-mounted-modal-description"
       >
         <Box sx={style}>
-          {/* Title */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginLeft: "10px",
-              marginBottom: "10px",
-              marginTop: "10px",
-            }}
-          >
-            <Typography variant="h6" component="h2" fontWeight={"bold"}>
-              Thông tin tài khoản
-            </Typography>
-            <IconButton onClick={handleCloseModal} sx={{ color: "black" }}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          {/* Avatar */}
-          <Box>
-            {/* <img
-              src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="bla bla"
-              style={{ width: "100%", height: 160, objectFit: "cover" }}
-              onClick={() => setOpen(true)}
-            /> */}
-            <ModalImage
-              isImage={true}
-              src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="bla bla"
-              styleOrigin={{ width: "100%", height: 160, objectFit: "cover" }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                alt="bla bla"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-              />
-            </ModalImage>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "left",
-              alignItems: "center",
-              marginBottom: "0px",
-              gap: "10px",
-              position: "relative",
-              top: "-20px",
-              marginLeft: "15px",
-            }}
-          >
-            <Badge
-              overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              badgeContent={<AvatarModal />}
-            >
-              <ModalImage
-                isOpen={false}
-                src="/static/images/avatar/2.jpg"
-                alt="load"
-                styleOrigin={{
-                  width: 70,
-                  height: 70,
-                  border: "1px solid #fff",
-                }}
-              >
-                <img
-                  src="/static/images/avatar/2.jpg"
-                  alt="load"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                  }}
-                />
-              </ModalImage>
-            </Badge>
-            <Typography variant="h6" component="h2" fontWeight={"bold"}>
-              Đăng Quang
-            </Typography>
-            <IconButton sx={{ minWidth: 0, padding: 0 }}>
-              <BorderColorOutlinedIcon sx={{ color: "#000" }} />
-            </IconButton>
-          </Box>
-          {/* line break */}
-          <Box sx={{ marginBottom: "10px" }}>
-            <hr style={{ border: "1px solid #A0A0A0" }} />
-          </Box>
-          {/* Thông tin cá nhân */}
-          <Box marginLeft={2}>
-            <Typography variant="h6" fontWeight={"bold"}>
-              {" "}
-              Thông tin cá nhân{" "}
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography variant="body1" sx={{ color: "gray" }}>
-                  Giới tính
-                </Typography>
-                <Typography variant="body1" sx={{ color: "gray" }}>
-                  Ngày sinh
-                </Typography>
-                <Typography variant="body1" sx={{ color: "gray" }}>
-                  Điện thoại
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography variant="body1">Nam</Typography>
-                <Typography variant="body1">20/12/2000</Typography>
-                <Typography variant="body1">090225252</Typography>
-              </Grid>
-            </Grid>
-          </Box>
-          {/* line break */}
-          <Box sx={{ marginBottom: "10px" }}>
-            <hr style={{ border: "1px solid #A0A0A0" }} />
-          </Box>
-          {/* Hình ảnh */}
-          <Box marginLeft={2}>
-            <Typography variant="h6" fontWeight={"bold"}>
-              Hình ảnh
-            </Typography>
-            <ImageList cols={4} rowHeight={100}>
-              <ImageListItem>
-                {/* sử dụng modal image */}
-
-                <ModalImage
-                  isImage={true}
-                  src="https://images.unsplash.com/photo-1694439977524-e59aac9bd44c?q=80&w=1967&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="bla bla"
-                  styleOrigin={{
-                    width: "100%",
-                    height: 100,
-                    objectFit: "cover",
-                  }}
-                >
-                  <img
-                    src="https://images.unsplash.com/photo-1694439977524-e59aac9bd44c?q=80&w=1967&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt="bla bla"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </ModalImage>
-              </ImageListItem>
-            </ImageList>
-          </Box>
-          {/* line break */}
-          <Box sx={{ marginBottom: "10px" }}>
-            <hr style={{ border: "1px solid #A0A0A0" }} />
-          </Box>
-          {/* Chức năng xử lí thêm */}
-          <List>
-            <ListItemButton>
-              <GroupOutlinedIcon sx={{ marginRight: 2 }} />
-              <Typography>Nhóm chung</Typography>
-            </ListItemButton>
-            <ListItemButton>
-              <BlockOutlinedIcon sx={{ marginRight: 2 }} />
-              <Typography>Chặn tin nhắn</Typography>
-            </ListItemButton>
-            <ListItemButton>
-              <DeleteOutlineOutlinedIcon sx={{ marginRight: 2 }} />
-              <Typography>Xoá bạn bè</Typography>
-            </ListItemButton>
-          </List>
-          {/* line break */}
-          <Box sx={{ marginBottom: "10px" }}>
-            <hr style={{ border: "1px solid #A0A0A0" }} />
-          </Box>
-          {/* Cập nhật */}
-          <Button
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              color: "black",
-              textTransform: "none",
-            }}
-          >
-            <BorderColorOutlinedIcon fontSize="medium" />
-            <Typography variant="h6" component="h2" fontWeight={"medium"}>
-              Cập nhật
-            </Typography>
-          </Button>
+          {/* Modal navigation */}
+          {body === "default" && (
+            <InfoBody
+              changeBody={changeBody}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
+          {body === "avatar_editor" && (
+            <AvatarEdit
+              changeBody={changeBody}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
+          {body === "image_uploader" && (
+            <ImageUploader
+              changeBody={changeBody}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
+          {body === "info_edit" && (
+            <InfoEdit
+              changeBody={changeBody}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
+          {body === "common_group" && (
+            <CommonGroup
+              changeBody={changeBody}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
         </Box>
       </Modal>
     </div>
   );
 }
-
-function AvatarModal() {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
+function HeaderModal({ name, changeBody, back, handleCloseModal }) {
   return (
-    <>
-      <Button
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingBottom: "10px",
+        paddingTop: "10px",
+        paddingRight: "10px",
+        paddingLeft: "2px",
+      }}
+    >
+      <Box
         sx={{
-          minWidth: 0,
-          padding: "5px",
-          backgroundColor: "#C0C0C0",
-          borderRadius: "50%",
-          border: "1px solid #fff",
+          display: "flex",
+          justifyContent: "start",
+          alignItems: "center",
+          gap: "3px",
         }}
-        variant="rounded"
-        onClick={handleOpen}
       >
-        <CameraEnhanceOutlinedIcon sx={{ color: "#606060" }} />
-      </Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
-      >
-        <Box sx={{ ...style }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              // marginLeft: "10px",
-              marginBottom: "10px",
-              marginTop: "10px",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "start",
-                alignItems: "center",
-              }}
-            >
-              <IconButton onClick={handleClose}>
-                <ArrowBackIosNewOutlinedIcon />
-              </IconButton>
-              <Typography variant="h6" component="h2" fontWeight={"bold"}>
-                Cập nhật ảnh đại diện
-              </Typography>
-            </Box>
-            <IconButton onClick={handleClose} sx={{ color: "black" }}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <Box>
-            <Box>
-              {/* <label htmlFor="upload" style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '10px 15px',
-                margin: '10px 10px',
-                borderRadius: '3px',
-                cursor: 'pointer',
-                backgroundColor: 'rgb(229, 239, 255)',
-                color: 'rgb(0, 90, 224)',
-                fontWeight: 500,
-                fontSize: '18px',
-              }} >
-                <ImageOutlinedIcon />
-                Tải ảnh từ máy lên
-              </label>
-              <input id="upload" type="file" accept="image/*" style={{display: 'none', padding: '10px 10px'}}/>
-               */}
-              <ImageUploader />
-            </Box>
-            <Box marginLeft={2}>
-              <Typography variant="h6" component="h2" fontWeight={"bold"}>
-                {" "}
-                Ảnh đại diện của bạn{" "}
-              </Typography>
-              <Box>
-                <Avatar
-                  src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="bla bla"
-                  style={{ width: 70, height: 70, border: "1px solid #fff" }}
-                />
-              </Box>
-            </Box>
-          </Box>
-          {/* <Button onClick={handleClose}>Close Child Modal</Button> */}
-        </Box>
-      </Modal>
-    </>
+        <IconButton
+          onClick={() => {
+            changeBody(back);
+          }}
+        >
+          <ArrowBackIosNewOutlinedIcon />
+        </IconButton>
+        <Typography variant="h6" component="h2" fontWeight={"bold"}>
+          {name}
+        </Typography>
+      </Box>
+      <IconButton onClick={handleCloseModal} sx={{ color: "black" }}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
   );
 }
-function InformationModal() {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
 
+function InfoBody({ changeBody, handleCloseModal }) {
+  useEffect(() => {
+    fetch("https://65cdef30c715428e8b3f82d1.mockapi.io/person")
+      .then((response) => response.json())
+      .then((json) => console.log(json));
+  
+  }, []);
   return (
     <>
-      <Button onClick={handleOpen}>Open Child Modal</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
+      {/* Title */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginLeft: "10px",
+          marginBottom: "10px",
+          marginTop: "10px",
+        }}
       >
-        <Box sx={{ ...style }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              // marginLeft: "10px",
-              marginBottom: "10px",
-              marginTop: "10px",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "start",
-                alignItems: "center",
-              }}
-            >
-              <IconButton onClick={handleClose}>
-                <ArrowBackIosNewOutlinedIcon />
-              </IconButton>
-              <Typography variant="h6" component="h2" fontWeight={"bold"}>
-                Cập nhật thông tin cá nhân
-              </Typography>
-            </Box>
-            <IconButton onClick={handleClose} sx={{ color: "black" }}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          {/* <h2 id="child-modal-title">Text in a child modal</h2>
-          <p id="child-modal-description">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-          </p> */}
-          <Button onClick={handleClose}>Close Child Modal</Button>
-        </Box>
-      </Modal>
+        <Typography variant="h6" component="h2" fontWeight={"bold"}>
+          Thông tin tài khoản
+        </Typography>
+        <IconButton onClick={handleCloseModal} sx={{ color: "black" }}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+      {/* Avatar */}
+      <AvatarHome changeBody={changeBody} />
+      {/* line break */}
+      <Box sx={{ marginBottom: "10px" }}>
+        <hr style={{ border: "1px solid #A0A0A0" }} />
+      </Box>
+      {/* Thông tin cá nhân */}
+      <Info />
+      {/* line break */}
+      <Box sx={{ marginBottom: "10px" }}>
+        <hr style={{ border: "1px solid #A0A0A0" }} />
+      </Box>
+      {/* Hình ảnh */}
+      <Image />
+      {/* line break */}
+      <Box sx={{ marginBottom: "10px" }}>
+        <hr style={{ border: "1px solid #A0A0A0" }} />
+      </Box>
+      {/* Chức năng xử lí thêm */}
+      <AnotherFunctions />
+      {/* line break */}
+      <Box sx={{ marginBottom: "10px" }}>
+        <hr style={{ border: "1px solid #A0A0A0" }} />
+      </Box>
+      {/* Cập nhật */}
+      <ButtonUpdate changeBody={changeBody} />
     </>
   );
 }
-function GroupModal() {
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
+function AvatarHome({ changeBody }) {
   return (
     <>
-      <Button onClick={handleOpen}>Open Child Modal</Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
+      <Box>
+        <ModalImage
+          isImage={true}
+          srcs="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="bla bla"
+          styleOrigin={{ width: "100%", height: 160, objectFit: "cover" }}
+        >
+          <img
+            src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="bla bla"
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          />
+        </ModalImage>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "left",
+          alignItems: "center",
+          marginBottom: "0px",
+          gap: "10px",
+          position: "relative",
+          top: "-20px",
+          marginLeft: "15px",
+        }}
       >
-        <Box sx={{ ...style }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              // marginLeft: "10px",
-              marginBottom: "10px",
-              marginTop: "10px",
+        <Badge
+          overlap="circular"
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          badgeContent={
+            <Button
+              sx={{
+                minWidth: 0,
+                padding: "5px",
+                backgroundColor: "#C0C0C0",
+                borderRadius: "50%",
+                border: "1px solid #fff",
+              }}
+              variant="rounded"
+              onClick={() => changeBody("avatar_editor")}
+            >
+              <CameraEnhanceOutlinedIcon sx={{ color: "#606060" }} />
+            </Button>
+          }
+        >
+          <ModalImage
+            isOpen={false}
+            srcs="/static/images/avatar/2.jpg"
+            alt="load"
+            styleOrigin={{
+              width: 70,
+              height: 70,
+              border: "1px solid #fff",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "start",
-                alignItems: "center",
+            <img
+              src="/static/images/avatar/2.jpg"
+              alt="load"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
               }}
-            >
-              <IconButton onClick={handleClose}>
-                <ArrowBackIosNewOutlinedIcon />
-              </IconButton>
-              <Typography variant="h6" component="h2" fontWeight={"bold"}>
-                Nhóm chung
-              </Typography>
-            </Box>
-            <IconButton onClick={handleClose} sx={{ color: "black" }}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          <h2 id="child-modal-title">Text in a child modal</h2>
-          <p id="child-modal-description">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-          </p>
-          <Button onClick={handleClose}>Close Child Modal</Button>
-        </Box>
-      </Modal>
+            />
+          </ModalImage>
+        </Badge>
+        <Typography variant="h6" component="h2" fontWeight={"bold"}>
+          Đăng Quang
+        </Typography>
+        <IconButton
+          sx={{ minWidth: 0, padding: 0 }}
+          onClick={() => changeBody("info_edit")}
+        >
+          <BorderColorOutlinedIcon sx={{ color: "#000" }} />
+        </IconButton>
+      </Box>
     </>
   );
 }
-function ImageUploader() {
-  const [open, setOpen] = useState(false);
+function AvatarEdit({ changeBody, handleCloseModal }) {
+  const updateAvatar = (imageUrl) => {};
+  return (
+    <>
+      <Box sx={{ ...style }}>
+        <HeaderModal
+          name="Cập nhật ảnh đại diện"
+          changeBody={changeBody}
+          back="default"
+          handleCloseModal={handleCloseModal}
+        />
+        <Box>
+          <ImageUploader
+            changeBody={changeBody}
+            handleCloseModal={handleCloseModal}
+          />
+        </Box>
+        {/* <Button onClick={handleClose}>Close Child Modal</Button> */}
+      </Box>
+    </>
+  );
+}
+function ImageUploader({ changeBody, handleCloseModal }) {
+  const [open, setOpen] = useState(false); // Hiển thị
   const [image, setImage] = useState(null);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
   const inputRef = useRef();
   const canvasRef = useRef();
   const [scale, setScale] = useState(1.2);
 
-const handleScaleChange = (event, newValue) => {
-  setScale(newValue);
-};
+  const handleScaleChange = (event, newValue) => {
+    setScale(newValue);
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
     setImage(url);
-    handleOpen();
-    // const img = new Image();
-    // img.onload = () => {
-    //   if (canvasRef.current) {
-    //     const ctx = canvasRef.current.getContext('2d');
-    //     canvasRef.current.width = img.width;
-    //     canvasRef.current.height = img.height;
-
-    //     // set the canvas position to absolute
-    //     canvasRef.current.style.position = 'absolute';
-    //     canvasRef.current.style.top = '50%';
-    //     canvasRef.current.style.left = '50%';
-    //     canvasRef.current.style.transform = 'translate(-50%, -50%)';
-
-    //     ctx.drawImage(img, 0, 0, img.width, img.height);
-    //   }
-
-    // };
-    // img.src = url;
-    // handleOpen();
+    setOpen(true);
+    // changeBody("image_uploader");
   };
 
-  
-  // useEffect(() => {
-  //   if (canvasRef.current) {
-  //     const ctx = canvasRef.current.getContext('2d');
-  //     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  //   }
-  // }, []);
-
+  const handleSave = () => {
+    const canvas = canvasRef.current;
+    const dataURL = canvas.toDataURL();
+    const file = dataURLtoFile(dataURL, "avatar.png");
+    console.log(file);
+  };
   return (
-    // <div>
-    //   <input ref={inputRef} type="file" onChange={handleFileChange} />
-    //   <canvas ref={canvasRef} width="500" height="500" />
-    // </div>
     <Box>
-      <label
-        htmlFor="upload"
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "10px 15px",
-          margin: "10px 10px",
-          borderRadius: "3px",
-          cursor: "pointer",
-          backgroundColor: "rgb(229, 239, 255)",
-          color: "rgb(0, 90, 224)",
-          fontWeight: 500,
-          fontSize: "18px",
-        }}
-      >
-        <ImageOutlinedIcon />
-        Tải ảnh từ máy lên
-      </label>
-      <input
-        id="upload"
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        style={{ display: "none", padding: "10px 10px" }}
-        onChange={handleFileChange}
-      />
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          {/* <Box sx={{ // image editor
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
-        }}>
-          <Box
-            sx={{ // crop container
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'column',
-              flex: 1,
-            }}
-          >
-            <Box
-              sx={{ // crop locked
-                position: 'relative',
-                width: '100%',
-                height: '100%',
+      {!open && (
+        <Box>
+          <Box>
+            <label
+              htmlFor="upload"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "10px 15px",
+                margin: "10px 10px",
+                borderRadius: "3px",
+                cursor: "pointer",
+                backgroundColor: "rgb(229, 239, 255)",
+                color: "rgb(0, 90, 224)",
+                fontWeight: 500,
+                fontSize: "18px",
               }}
             >
-              <Box
-                sx={{ // add on
-                  position: 'absolute',
-                  border: 'none',
-                  maxWidth: '300px',
-                  maxHeight: '300px',
-                  zIndex: 1,
-                }}
-              >
-              </Box>
-              <Box
-                sx={{ // crop preview
-                  position: 'absolute',
-                  border: '1px solid #fff',
-                  maxWidth: '300px',
-                  maxHeight: '300px',
-                  cursor: 'move',
-                  zIndex: 2,
-                  transform: 'translate(-50%, -50%)',
-                  boxshadow: '0 0 0 1000px rgba(0, 0, 0, 0.5)',
-                }}
-              >
-              
-              </Box>
-              <Box
-                sx={{ // crop background
-                  maxWidth: '100%',
-                  maxHeight: '100%',
-                  width: '100%',
-                  height: '100%',
-                }}
-              >
-                <canvas ref={canvasRef} sx={{
-                  position: 'relative',
-                  aspectRatio: 'auto 240 / 424',
-                  // top: '50%',
-                  // left: '50%',
-                  // transform: 'translate(-50%, -50%)',
-                
-                }}/>
-              </Box>
+              <ImageOutlinedIcon />
+              Tải ảnh từ máy lên
+            </label>
+            <input
+              id="upload"
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: "none", padding: "10px 10px" }}
+              onChange={handleFileChange}
+            />
+          </Box>
+          <Box marginLeft={2}>
+            <Typography variant="h6" component="h2" fontWeight={"bold"}>
+              Ảnh đại diện của bạn
+            </Typography>
+            <Box>
+              <Avatar
+                src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="bla bla"
+                style={{ width: 70, height: 70, border: "1px solid #fff" }}
+              />
             </Box>
           </Box>
-          
-        </Box> */}
+        </Box>
+      )}
+
+      {open && (
+        <Box sx={style}>
           <Box
             sx={{
               display: "flex",
@@ -664,9 +397,10 @@ const handleScaleChange = (event, newValue) => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                // marginLeft: "10px",
-                marginBottom: "10px",
-                marginTop: "10px",
+                paddingBottom: "10px",
+                paddingTop: "10px",
+                paddingRight: "10px",
+                paddingLeft: "2px",
               }}
             >
               <Box
@@ -674,38 +408,45 @@ const handleScaleChange = (event, newValue) => {
                   display: "flex",
                   justifyContent: "start",
                   alignItems: "center",
+                  gap: "3px",
                 }}
               >
-                <IconButton onClick={handleClose}>
+                <IconButton
+                  onClick={() => {
+                    changeBody("avatar_editor");
+                    setOpen(false);
+                  }}
+                >
                   <ArrowBackIosNewOutlinedIcon />
                 </IconButton>
                 <Typography variant="h6" component="h2" fontWeight={"bold"}>
                   Cập nhật ảnh đại diện
                 </Typography>
               </Box>
-              <IconButton onClick={handleClose} sx={{ color: "black" }}>
+              <IconButton onClick={handleCloseModal} sx={{ color: "black" }}>
                 <CloseIcon />
               </IconButton>
             </Box>
+            <Box />
             {image && (
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                height: '100%',
-              
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
                 <AvatarEditor
                   image={image}
-                  width={300}
-                  height={300}
+                  width={250}
+                  height={250}
                   border={50}
                   color={[255, 255, 255, 0.6]} // RGBA
                   scale={scale}
                   rotate={0}
-                  borderRadius={125}
-                
+                  borderRadius={150}
                 />
               </Box>
             )}
@@ -727,27 +468,436 @@ const handleScaleChange = (event, newValue) => {
             />
           </Box>
           <Box
-          
+            sx={{
+              display: "flex",
+              justifyContent: "right",
+              alignItems: "center",
+              marginTop: "30px",
+              gap: "10px",
+              marginRight: "10px",
+            }}
           >
-            <Button
+            <button
               style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-                color: "black",
-                textTransform: "none",
+                backgroundColor: "#EAEDF0",
+                color: "#38485B",
+                fontSize: "1.2rem",
+                border: "none",
+                padding: "8px 16px",
+              }}
+              onClick={() => setOpen(false)}
+            >
+              Huỷ
+            </button>
+            <button
+              onClick={() => {
+                setOpen(false);
+              }}
+              style={{
+                backgroundColor: "#0068FF",
+                color: "white",
+                fontSize: "1.2rem",
+                border: "none",
+                padding: "8px 16px",
               }}
             >
-              <BorderColorOutlinedIcon fontSize="medium" />
-              <Typography variant="h6" component="h2" fontWeight={"medium"}>
-                Cập nhật
-              </Typography>
-            </Button>
+              Cập nhật
+            </button>
           </Box>
         </Box>
+      )}
+    </Box>
+  );
+}
+function Info() {
+  return (
+    <Box marginLeft={2}>
+        <Typography variant="h6" fontWeight={"bold"}>
+          {" "}
+          Thông tin cá nhân{" "}
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <Typography variant="body1" sx={{ color: "gray" }}>
+              Giới tính
+            </Typography>
+            <Typography variant="body1" sx={{ color: "gray" }}>
+              Ngày sinh
+            </Typography>
+            <Typography variant="body1" sx={{ color: "gray" }}>
+              Điện thoại
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant="body1">Nam</Typography>
+            <Typography variant="body1">20/12/2000</Typography>
+            <Typography variant="body1">090225252</Typography>
+          </Grid>
+        </Grid>
+      </Box>
+  );
+}
+function InfoEdit({ changeBody, handleCloseModal }) {
+  const [value, setValue] = useState("Đăng Quang");
+  const [checked, setChecked] = useState(true);
+  const [date, setDate] = useState("2022-01-01");
+
+  const handleChangeDate = (event) => {
+    setDate(event.target.value);
+  };
+  const handleChangeGender = (event) => {
+    setChecked(event.target.checked);
+  };
+  const handleChangeName = (event) => {
+    setValue(event.target.value);
+  };
+  return (
+    <Box sx={{ ...style }}>
+      <HeaderModal
+        name="Chỉnh sửa thông tin"
+        changeBody={changeBody}
+        back="default"
+        handleCloseModal={handleCloseModal}
+      />
+      <Box
+        sx={{
+          width: "100%",
+          height: "87%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            padding: "10px",
+          }}
+        >
+          <Box>
+            <Typography>Tên hiển thị</Typography>
+            <input
+              type="text"
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #A0A0A0",
+                boxSizing: "border-box",
+              }}
+              value={value}
+              onChange={handleChangeName}
+            />
+          </Box>
+          <Box>
+            <Typography variant="h6" component="h2" fontWeight={"bold"}>
+              Giới tính
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "left",
+                alignItems: "center",
+                gap: "30px",
+                marginY: "10px",
+              }}
+            >
+              <div>
+                <input
+                  type="radio"
+                  id="nam"
+                  name="gt"
+                  value="Nam"
+                  checked={checked}
+                  onChange={handleChangeGender}
+                />
+                <label htmlFor="nam">Nam</label>
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  id="nu"
+                  name="gt"
+                  value="Nữ"
+                  onChange={handleChangeGender}
+                />
+                <label htmlFor="nu">Nữ</label>
+              </div>
+            </Box>
+          </Box>
+          <Box>
+            <Typography>Ngày sinh</Typography>
+            <input
+              type="date"
+              style={{
+                minWidth: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #A0A0A0",
+                boxSizing: "border-box",
+              }}
+              value={date}
+              onChange={handleChangeDate}
+            />
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "right",
+            alignItems: "center",
+            marginTop: "30px",
+            gap: "10px",
+            marginRight: "10px",
+          }}
+        >
+          <button
+            style={{
+              backgroundColor: "#EAEDF0",
+              color: "#38485B",
+              fontSize: "1.2rem",
+              border: "none",
+              padding: "8px 16px",
+            }}
+            onClick={() => changeBody("default")}
+          >
+            Huỷ
+          </button>
+          <button
+            onClick={() => {
+              changeBody("default");
+            }}
+            style={{
+              backgroundColor: "#0068FF",
+              color: "white",
+              fontSize: "1.2rem",
+              border: "none",
+              padding: "8px 16px",
+            }}
+          >
+            Cập nhật
+          </button>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+function AnotherFunctions() {
+  return (
+    <List>
+        <ListItemButton onClick={() => changeBody("common_group")}>
+          <GroupOutlinedIcon sx={{ marginRight: 2 }} />
+          <Typography>Nhóm chung</Typography>
+        </ListItemButton>
+        <ListItemButton>
+          <BlockOutlinedIcon sx={{ marginRight: 2 }} />
+          <Typography>Chặn tin nhắn</Typography>
+        </ListItemButton>
+        <ListItemButton>
+          <DeleteOutlineOutlinedIcon sx={{ marginRight: 2 }} />
+          <Typography>Xoá bạn bè</Typography>
+        </ListItemButton>
+      </List>
+  );
+}
+function CommonGroup({ changeBody, handleCloseModal }) {
+  return (
+    <Box sx={style}>
+      <HeaderModal
+        name="Nhóm chung"
+        changeBody={changeBody}
+        back="default"
+        handleCloseModal={handleCloseModal}
+      />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          paddingX: "10px",
+        }}
+      >
+        <Box
+          sx={{ position: "relative", display: "flex", alignItems: "center" }}
+        >
+          {/* Tìm kiếm nhóm theo tên */}
+          <SearchOutlinedIcon sx={{ position: "absolute", left: "10px" }} />
+          <input
+            type="text"
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "10px",
+              border: "none",
+              boxSizing: "border-box",
+              backgroundColor: "#EAEDF0",
+              paddingLeft: "40px",
+            }}
+            placeholder="Tìm nhóm theo tên"
+          />
+        </Box>
+        <div style={{ overflowY: "scroll", height: "430px" }}>
+          <List>
+            <ListItemButton>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "10px",
+                  msFlexDirection: "row",
+                  width: "100%",
+                }}
+              >
+                <AvatarGroup>
+                  <Avatar
+                    alt="Remy Sharp"
+                    src="https://mui.com/static/images/avatar/1.jpg"
+                  />
+                </AvatarGroup>
+                <Typography>Nhóm 1</Typography>
+              </Box>
+            </ListItemButton>
+            <ListItemButton>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "10px",
+                  msFlexDirection: "row",
+                  width: "100%",
+                }}
+              >
+                <AvatarGroup total={30} max={5} spacing="small">
+                  <AvatarGroup spacing="small">
+                    <Avatar
+                      alt="Remy Sharp"
+                      src="https://mui.com/static/images/avatar/1.jpg"
+                    />
+                    <Avatar
+                      alt="Travis Howard"
+                      src="https://mui.com/static/images/avatar/2.jpg"
+                    />
+                    <Avatar
+                      alt="Cindy Baker"
+                      src="https://mui.com/static/images/avatar/3.jpg"
+                    />
+                  </AvatarGroup>
+                </AvatarGroup>
+                <Typography>Nhóm 2</Typography>
+              </Box>
+            </ListItemButton>
+            <ListItemButton>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "10px",
+                  msFlexDirection: "row",
+                  width: "100%",
+                }}
+              >
+                <Avatar
+                  alt="Remy Sharp"
+                  src="https://mui.com/static/images/avatar/1.jpg"
+                />
+                <Typography>Nhóm 3</Typography>
+              </Box>
+            </ListItemButton>
+          </List>
+        </div>
+      </Box>
+    </Box>
+  );
+}
+function ButtonUpdate({ changeBody }) {
+  return (
+    <Button
+        style={{
+          display: "flex", 
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          color: "black",
+          textTransform: "none",
+        }}
+        onClick={() => changeBody("info_edit")}
+      >
+        <BorderColorOutlinedIcon fontSize="medium" />
+        <Typography variant="h6" component="h2" fontWeight={"medium"}>
+          Cập nhật
+        </Typography>
+      </Button>
+  );
+}  
+function Image() {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [activeImage, setActiveImage] = useState(1);
+
+  const openModal = (index) => {
+    setActiveImage(index);
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const srs = [
+    "https://mui.com/static/images/image-list/breakfast.jpg",
+    "https://mui.com/static/images/image-list/burgers.jpg",
+    "https://mui.com/static/images/image-list/camera.jpg",
+    "https://mui.com/static/images/image-list/morning.jpg",
+    "https://mui.com/static/images/image-list/hats.jpg",
+  ];
+  return (
+    <Box marginLeft={2}>
+      <Typography variant="h6" fontWeight={"bold"}>
+        Hình ảnh
+      </Typography>
+      <ImageList cols={4} rowHeight={100}>
+        {srs.map((src, index) => (
+          <ImageListItem key={index}>
+            <img src={src} alt="bla bla" onClick={() => openModal(index)} />
+          </ImageListItem>
+        ))}
+      </ImageList>
+      <Modal open={modalIsOpen} onClose={closeModal}>
+        <div
+          sx={{
+            maxWidth: "90%",
+            maxHeight: "90%",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          {/* <Slide index={activeImage}> */}
+          {srs.map((src, index) => (
+            <img src={src} alt="bla bla" key={index} />
+          ))}
+          {/* <img src={srs[activeImage]} alt="bla bla" /> */}
+          {/* </Slide> */}
+          {/* <img src={srs[activeImage]} alt="bla bla" /> */}
+        </div>
       </Modal>
     </Box>
   );
 }
 
+// function ImageGallery({ images }) {
+//   return (
+//     <ImageList cols={4} rowHeight={100}>
+//       {images.map((image, index) => (
+//         <ImageListItem key={index}>
+//           <img src={image} alt="bla bla" />
+//         </ImageListItem>
+//       ))}
+//     </ImageList>
+//   );
+// }

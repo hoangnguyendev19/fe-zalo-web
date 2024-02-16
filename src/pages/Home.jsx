@@ -23,7 +23,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import Loading from "../components/Loading";
 
 import Profile  from "./Profile";
-import Profilecp from "./Profilecopy";
 
 const Messager = lazy(() => import("./Messager"));
 const Contact = lazy(() => import("./Contact"));
@@ -129,7 +128,7 @@ const Home = () => {
                   >
                     <List>
                       <ListItem sx={{ padding: "0px" }}  >
-                        <Profilecp/>
+                        <Profile/>
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
                         <ListItemButton>
