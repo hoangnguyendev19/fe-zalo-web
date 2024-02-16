@@ -91,7 +91,7 @@ const Contact = () => {
                   <SearchIcon />
                 </InputAdornment>
               ),
-            }}
+            }} 
             variant="outlined"
             size="small"
             fullWidth
