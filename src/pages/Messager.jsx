@@ -19,6 +19,9 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ImageIcon from "@mui/icons-material/Image";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+
+import AddFriend from "../components/AddFriend";
+import CreateGroup from "../components/CreateGroup";
 import { useState } from "react";
 
 const listUser = [
@@ -98,14 +101,10 @@ const Messager = () => {
             fullWidth
           />
           <Box sx={{ marginLeft: "5px" }}>
-            <Button variant="text" sx={{ color: "black", minWidth: "0px" }}>
-              <PersonAddAltIcon />
-            </Button>
+            <AddFriend />
           </Box>
           <Box sx={{ marginLeft: "5px" }}>
-            <Button variant="text" sx={{ color: "black", minWidth: "0px" }}>
-              <GroupAddIcon />
-            </Button>
+           <CreateGroup />
           </Box>
         </Box>
         <Box sx={{ width: "100%", marginTop: "10px" }}>

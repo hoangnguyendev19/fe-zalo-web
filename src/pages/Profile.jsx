@@ -29,10 +29,11 @@ import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutl
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ModalImage from "../components/ModalImage";
-
-import { useEffect, useState, useRef, memo } from "react";
+import axios from "axios";
+import { useEffect, useState, useRef, memo, useLayoutEffect } from "react";
 import AvatarEditor from "react-avatar-editor";
-import { request } from "http";
+import { Await } from "react-router-dom";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -48,8 +49,10 @@ const style = {
 };
 
 export default function Profile() {
+  
   const [openModal, setOpenModal] = useState(false);
-  // const [openImage, setOpenImage] = useState(false);
+  
+  
   const handleOpenModal = () => {
     changeBody("default");
     setOpenModal(true);
@@ -101,8 +104,8 @@ export default function Profile() {
               handleCloseModal={handleCloseModal}
             />
           )}
-          {body === "common_group" && (
-            <CommonGroup
+          {body === "group_chat" && (
+            <GroupChat
               changeBody={changeBody}
               handleCloseModal={handleCloseModal}
             />
@@ -151,13 +154,8 @@ function HeaderModal({ name, changeBody, back, handleCloseModal }) {
   );
 }
 
-function InfoBody({ changeBody, handleCloseModal }) {
-  useEffect(() => {
-    fetch("https://65cdef30c715428e8b3f82d1.mockapi.io/person")
-      .then((response) => response.json())
-      .then((json) => console.log(json));
+function InfoBody({ changeBody, handleCloseModal, data }) {
   
-  }, []);
   return (
     <>
       {/* Title */}
@@ -197,7 +195,7 @@ function InfoBody({ changeBody, handleCloseModal }) {
         <hr style={{ border: "1px solid #A0A0A0" }} />
       </Box>
       {/* Chức năng xử lí thêm */}
-      <AnotherFunctions />
+      <AnotherFunctions changeBody={changeBody}/>
       {/* line break */}
       <Box sx={{ marginBottom: "10px" }}>
         <hr style={{ border: "1px solid #A0A0A0" }} />
@@ -510,6 +508,14 @@ function ImageUploader({ changeBody, handleCloseModal }) {
   );
 }
 function Info() {
+  const data = [
+    {
+      name: 'Đăng Quang',
+      gender: 'Nam',
+      date: '20/12/2000',
+      phone: '090225252'
+    }
+  ]
   return (
     <Box marginLeft={2}>
         <Typography variant="h6" fontWeight={"bold"}>
@@ -529,9 +535,15 @@ function Info() {
             </Typography>
           </Grid>
           <Grid item>
-            <Typography variant="body1">Nam</Typography>
-            <Typography variant="body1">20/12/2000</Typography>
-            <Typography variant="body1">090225252</Typography>
+            <Typography variant="body1"> 
+              {data[0].name}
+            </Typography>
+            <Typography variant="body1">
+              {data[0].date}
+            </Typography>
+            <Typography variant="body1">
+              {data[0].phone}
+            </Typography>
           </Grid>
         </Grid>
       </Box>
@@ -684,10 +696,10 @@ function InfoEdit({ changeBody, handleCloseModal }) {
     </Box>
   );
 }
-function AnotherFunctions() {
+function AnotherFunctions({ changeBody}) {
   return (
     <List>
-        <ListItemButton onClick={() => changeBody("common_group")}>
+        <ListItemButton onClick={() => changeBody("group_chat")}>
           <GroupOutlinedIcon sx={{ marginRight: 2 }} />
           <Typography>Nhóm chung</Typography>
         </ListItemButton>
@@ -702,7 +714,7 @@ function AnotherFunctions() {
       </List>
   );
 }
-function CommonGroup({ changeBody, handleCloseModal }) {
+function GroupChat({ changeBody, handleCloseModal }) {
   return (
     <Box sx={style}>
       <HeaderModal
@@ -835,6 +847,19 @@ function ButtonUpdate({ changeBody }) {
   );
 }  
 function Image() {
+  
+  const [data, setData] = useState([]);
+ 
+  useLayoutEffect(() => {
+    const fetchData = async () => {
+      const result = await axios.get(
+        "https://65cdef30c715428e8b3f82d1.mockapi.io/person"
+      );
+      setData(result.data[0].picture);
+      };
+      fetchData();
+  }, []);
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(1);
 
@@ -847,20 +872,13 @@ function Image() {
     setModalIsOpen(false);
   };
 
-  const srs = [
-    "https://mui.com/static/images/image-list/breakfast.jpg",
-    "https://mui.com/static/images/image-list/burgers.jpg",
-    "https://mui.com/static/images/image-list/camera.jpg",
-    "https://mui.com/static/images/image-list/morning.jpg",
-    "https://mui.com/static/images/image-list/hats.jpg",
-  ];
   return (
     <Box marginLeft={2}>
       <Typography variant="h6" fontWeight={"bold"}>
         Hình ảnh
       </Typography>
       <ImageList cols={4} rowHeight={100}>
-        {srs.map((src, index) => (
+        {data.map((src, index) => (
           <ImageListItem key={index}>
             <img src={src} alt="bla bla" onClick={() => openModal(index)} />
           </ImageListItem>
@@ -877,13 +895,9 @@ function Image() {
             transform: "translate(-50%, -50%)",
           }}
         >
-          {/* <Slide index={activeImage}> */}
-          {srs.map((src, index) => (
+          {data.map((src, index) => (
             <img src={src} alt="bla bla" key={index} />
           ))}
-          {/* <img src={srs[activeImage]} alt="bla bla" /> */}
-          {/* </Slide> */}
-          {/* <img src={srs[activeImage]} alt="bla bla" /> */}
         </div>
       </Modal>
     </Box>
