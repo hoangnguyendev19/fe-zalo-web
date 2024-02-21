@@ -14,10 +14,12 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import DraftsOutlinedIcon from "@mui/icons-material/DraftsOutlined";
-import { useState } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import ListFriend from "../components/ListFriend";
 import ListGroup from "../components/ListGroup";
 import RequestFriend from "../components/RequestFriend";
+import axios from "axios";
+import { DatasetLinkedTwoTone } from "@mui/icons-material";
 
 const listUser = [
   {
@@ -74,6 +76,36 @@ function a11yProps(index) {
 const Contact = () => {
   const [show, setShow] = useState("ListFriend");
   const [value, setValue] = useState(0);
+  const [listFriends, setListFriends] = useState([]);
+  const [listGroups, setListGroups] = useState([]);
+  const [listRequestFriends, setListRequestFriends] = useState([]);
+  const [listReceiveRequestFriends, setListReceiveRequestFriends] = useState([]);
+  const [listFriendsExample, setListFriendsExample] = useState([]);
+
+  useLayoutEffect(() => {
+    async function fetchDataListFriends() {
+      const response = await axios.get('http://localhost:8080/api/person/get-all')
+      setListFriends(response.data)
+    }
+
+    async function fetchDataListGroups() {
+      const response = await axios.get('http://localhost:8080/api/group-message/get-info-group-and-person-join')
+      setListGroups(response.data)
+    }
+
+    async function fetchDataListRequestFriends() { 
+      const reponseRequestFriends = await axios.get('http://localhost:8080/api/friends/get-send-request-friends/7')
+      setListRequestFriends(reponseRequestFriends.data)
+      const reponseReceiveRequestFriends = await axios.get('http://localhost:8080/api/friends/get-receive-request-friends/2')
+      setListReceiveRequestFriends(reponseReceiveRequestFriends.data)
+      const reponseFriendsExample = await axios.get('http://localhost:8080/api/person/get-all-persons-except-one-person/1')
+      setListFriendsExample(reponseFriendsExample.data)
+    }
+
+    fetchDataListFriends()
+    fetchDataListGroups()
+    fetchDataListRequestFriends()
+  }, [])
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -162,9 +194,10 @@ const Contact = () => {
         </Box>
       </Grid>
       <Grid item xs={8.3}>
-        {show === "ListFriend" && <ListFriend />}
-        {show === "ListGroup" && <ListGroup />}
-        {show === "RequestFriend" && <RequestFriend />}
+        {show === "ListFriend" && <ListFriend listFriends={listFriends} />}
+        {show === "ListGroup" && <ListGroup listGroups={listGroups} />}
+        {show === "RequestFriend" && <RequestFriend listRequestFriends={listRequestFriends}
+          listReceiveRequestFriend={listReceiveRequestFriends} listFriendsExample={listFriendsExample} />}
       </Grid>
     </>
   );
