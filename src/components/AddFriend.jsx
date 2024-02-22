@@ -38,7 +38,7 @@ export default function AddFriend() {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            height: "60vh",
+            height: "550px",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 0,
@@ -49,8 +49,7 @@ export default function AddFriend() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              paddingBottom: "10px",
-              paddingTop: "10px",
+              paddingY: "6px",
               paddingRight: "10px",
               paddingLeft: "2px",
               borderBottom: "1px solid #e0e0e0",
@@ -65,8 +64,7 @@ export default function AddFriend() {
               }}
             >
               <Typography
-                variant="h6"
-                component="h2"
+                variant="subtitle1"
                 fontWeight={"bold"}
                 marginLeft={2}
               >
@@ -86,7 +84,7 @@ export default function AddFriend() {
               flexDirection: "column",
               padding: "16px",
               paddingTop: "0px",
-              height: "91%",
+              height: "88%",
             }}
           >
             <Box marginBottom={2}>
@@ -100,7 +98,7 @@ export default function AddFriend() {
             <Box
               sx={{
                 overflowY: "auto",
-                height: "70%",
+                height: "75%",
               }}
             >
               <Typography>Kết quả gần đây:</Typography>

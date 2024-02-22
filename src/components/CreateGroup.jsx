@@ -83,7 +83,7 @@ export default function CreateGroup() {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            height: "60vh",
+            height: "550px",
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 0,
@@ -94,8 +94,7 @@ export default function CreateGroup() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              paddingBottom: "10px",
-              paddingTop: "10px",
+              paddingY: "6px",
               paddingRight: "10px",
               paddingLeft: "2px",
               borderBottom: "1px solid #e0e0e0",
@@ -110,8 +109,7 @@ export default function CreateGroup() {
               }}
             >
               <Typography
-                variant="h6"
-                component="h2"
+                variant="subtitle1"
                 fontWeight={"bold"}
                 marginLeft={2}
               >
@@ -131,7 +129,7 @@ export default function CreateGroup() {
               flexDirection: "column",
               padding: "16px",
               paddingTop: "0px",
-              height: "86%",
+              height: "87%",
             }}
           >
             <Box
@@ -159,7 +157,7 @@ export default function CreateGroup() {
             </Box>
             <Box
               sx={{
-                height: "74%",
+                height: "75%",
                 borderBox: "box-sizing",
                 paddingTop: "2px",
               }}
