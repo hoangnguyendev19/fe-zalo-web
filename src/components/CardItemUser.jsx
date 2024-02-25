@@ -6,7 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const CardItemUser = ({ avatarUrl, name, message }) => {
+const CardItemUser = ({ avatarUrl, name, message, handleClickMessage}) => {
   return (
     <ListItem sx={{ padding: "0px" }}>
       <ListItemButton
@@ -15,6 +15,7 @@ const CardItemUser = ({ avatarUrl, name, message }) => {
           paddingLeft: "5px",
           paddingRight: "0px",
         }}
+        onClick = {handleClickMessage}
       >
         <Box sx={{ marginRight: "10px" }}>
           <Avatar alt={name} src={avatarUrl} />

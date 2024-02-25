@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const CardItemGroup = ({ listUser, name, message }) => {
+const CardItemGroup = ({ listUser, name, message, handleClickMessage }) => {
   return (
     <ListItem sx={{ padding: "0px" }}>
       <ListItemButton
@@ -16,6 +16,7 @@ const CardItemGroup = ({ listUser, name, message }) => {
           paddingLeft: "5px",
           paddingRight: "0px",
         }}
+        onClick={handleClickMessage}
       >
         <Box sx={{ marginRight: "10px" }}>
           <AvatarGroup max={2}>
