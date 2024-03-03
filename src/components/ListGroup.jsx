@@ -20,7 +20,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import EastIcon from '@mui/icons-material/East';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
-const ListGroup = ({ listGroups: listGroups }) => {
+const ListGroup = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -31,6 +31,24 @@ const ListGroup = ({ listGroups: listGroups }) => {
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const listGroups = [
+    {
+      id: 1,
+      groupName: "Connecticut lycanthropes",
+      image: "https://picsum.photos/640/200"
+    },
+    {
+      id: 2,
+      groupName: "Massachusetts gooses",
+      image: "https://picsum.photos/1280/1024"
+    },
+    {
+      id: 3,
+      groupName: "Idaho dolphins",
+      image: "https://picsum.photos/1280/1024"
+    }
+  ]
 
   return (
     <>
@@ -131,11 +149,10 @@ const ListGroup = ({ listGroups: listGroups }) => {
                           <ListItemButton>
                             <Stack direction="row" alignItems={"center"}>
                               <ListItemAvatar>
-                                <Avatar alt={item.group.groupName} src={item.group.image} />
+                                <Avatar alt={item.groupName} src={item.image} />
                               </ListItemAvatar>
                               <Stack direction="column" spacing={0.5}>
-                                <Typography variant="button" fontWeight={"bold"}>{item.group.groupName}</Typography>
-                                <Typography variant="caption" color={"grey"}>{item.personJoin.length} Thành viên</Typography>
+                                <Typography variant="button" fontWeight={"bold"}>{item.groupName}</Typography>
                               </Stack>
                             </Stack>
                           </ListItemButton>

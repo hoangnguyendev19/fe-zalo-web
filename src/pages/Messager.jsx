@@ -19,7 +19,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ImageIcon from "@mui/icons-material/Image";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-
+import ListMessages from '../components/ListMessages'
 import AddFriend from "../components/AddFriend";
 import CreateGroup from "../components/CreateGroup";
 import { useState } from "react";
@@ -78,6 +78,12 @@ function a11yProps(index) {
 
 const Messager = () => {
   const [value, setValue] = useState(0);
+  const [indexMessage, setIndexMessage] = useState(1);
+
+  const handleClickMessage = (value) => {
+    console.log('Value: ', value)
+    setIndexMessage(value)
+  }
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -127,6 +133,7 @@ const Messager = () => {
               avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               name="Nguyen Huy Hoang"
               message="Dang dau v"
+              handleClickMessage={() => handleClickMessage(1)}
             />
             <CardItemUser
               avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -142,6 +149,7 @@ const Messager = () => {
               listUser={listUser}
               name="IUH_CNM_2023ssssssssssssss"
               message="Chua co tin nhansssssssssssssssssssssssssssss"
+              handleClickMessage={() => handleClickMessage(2)}
             />
             <CardItemUser
               avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -246,7 +254,12 @@ const Messager = () => {
           </Box>
         </Box>
         <Box sx={{ maxHeight: "500px", overflow: "auto" }}>
-          <Box sx={{ backgroundColor: "#ccc", height: "800px" }}></Box>
+
+          { /* Show list messages from the personal chat or group chat */}
+          <Box sx={{ backgroundColor: "#ccc", height: "800px" }}>
+            <ListMessages data={indexMessage}/>
+          </Box>
+
         </Box>
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", padding: "5px 0" }}>

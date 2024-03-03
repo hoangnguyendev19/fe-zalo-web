@@ -20,7 +20,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
-const ListFriend = ({ listFriends: listFriends }) => {
+const ListFriend = () => {
   const [selectSortName, setSelectSortName] = React.useState('increase'); //Select for choosing type sort
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -33,6 +33,24 @@ const ListFriend = ({ listFriends: listFriends }) => {
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const listFriends = [
+    {
+      id: 18,
+      name: "Đặng Thảo Đoàn Tiến",
+      image: "https://picsum.photos/720/348"
+    },
+    {
+      id: 8,
+      name: "Ngô Phan Vinh",
+      image: "https://picsum.photos/640/480"
+    },
+    {
+      id: 14,
+      name: "Đoàn Mai Kha Tăng",
+      image: "https://picsum.photos/640/350"
+    }
+  ]
 
   return (
     <>
@@ -96,13 +114,9 @@ const ListFriend = ({ listFriends: listFriends }) => {
               {/* Show list friends */}
               <Stack component="div">
                 {listFriends.map(data => {
-                  let getCurrentAlphabet = currentAlphabet;
-                  currentAlphabet = data.name.charAt(0).toUpperCase();
-
                   return (
                     <Box key={data.id}>
-                      {data.name.charAt(0) !== getCurrentAlphabet && <Typography ml={2} mt={2} variant="body1" fontWeight={600}>{data.name.charAt(0).toUpperCase()}</Typography>}
-                      <List>
+                     <List>
                         <ListItem disablePadding secondaryAction={
                           <ListItemButton >
                             <MoreHorizIcon 
