@@ -10,6 +10,7 @@ import {
   ListItemIcon,
   Popover,
   Typography,
+  Modal,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import ContactsIcon from "@mui/icons-material/Contacts";
@@ -20,6 +21,8 @@ import { useState, lazy, Suspense } from "react";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Loading from "../components/Loading";
+
+import Profile  from "./Profile";
 
 const Messager = lazy(() => import("./Messager"));
 const Contact = lazy(() => import("./Contact"));
@@ -124,13 +127,8 @@ const Home = () => {
                     }}
                   >
                     <List>
-                      <ListItem sx={{ padding: "0px" }}>
-                        <ListItemButton>
-                          <Box sx={{ marginRight: "10px" }}>
-                            <PersonOutlineIcon />
-                          </Box>
-                          <Typography>Thông tin tài khoản</Typography>
-                        </ListItemButton>
+                      <ListItem sx={{ padding: "0px" }}  >
+                        <Profile/>
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
                         <ListItemButton>
@@ -150,7 +148,7 @@ const Home = () => {
                       </ListItem>
                     </List>
                   </Popover>
-                  <ListItemButton aria-describedby={id} onClick={handleClick}>
+                      <ListItemButton aria-describedby={id} onClick={handleClick}>
                     <SettingsIcon sx={{ color: "#fff" }} />
                   </ListItemButton>
                 </ListItemIcon>

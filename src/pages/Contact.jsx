@@ -18,6 +18,9 @@ import { useState, useEffect, useLayoutEffect } from "react";
 import ListFriend from "../components/ListFriend";
 import ListGroup from "../components/ListGroup";
 import RequestFriend from "../components/RequestFriend";
+
+import AddFriend from "../components/AddFriend";
+import CreateGroup from "../components/CreateGroup";
 import axios from "axios";
 import { DatasetLinkedTwoTone } from "@mui/icons-material";
 
@@ -93,20 +96,16 @@ const Contact = () => {
                   <SearchIcon />
                 </InputAdornment>
               ),
-            }}
+            }} 
             variant="outlined"
             size="small"
             fullWidth
           />
           <Box sx={{ marginLeft: "5px" }}>
-            <Button variant="text" sx={{ color: "black", minWidth: "0px" }}>
-              <PersonAddAltIcon />
-            </Button>
+            <AddFriend />
           </Box>
           <Box sx={{ marginLeft: "5px" }}>
-            <Button variant="text" sx={{ color: "black", minWidth: "0px" }}>
-              <GroupAddIcon />
-            </Button>
+            <CreateGroup />
           </Box>
         </Box>
         <Box sx={{ width: "100%", marginTop: "10px" }}>
