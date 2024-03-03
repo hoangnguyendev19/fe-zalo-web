@@ -40,11 +40,15 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  height: "60vh",
+  height: "550px",
   bgcolor: "background.paper",
   // border: "2px solid #000",
   boxShadow: 24,
   overflowY: "auto",
+  // hide scrollbar
+  "&::-webkit-scrollbar": {
+    display: "none",
+  },
   p: 0,
 };
 
@@ -122,8 +126,8 @@ function HeaderModal({ name, changeBody, back, handleCloseModal }) {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingBottom: "10px",
-        paddingTop: "10px",
+        paddingBottom: "6px",
+        paddingTop: "6px",
         paddingRight: "10px",
         paddingLeft: "2px",
       }}
@@ -143,7 +147,7 @@ function HeaderModal({ name, changeBody, back, handleCloseModal }) {
         >
           <ArrowBackIosNewOutlinedIcon />
         </IconButton>
-        <Typography variant="h6" component="h2" fontWeight={"bold"}>
+        <Typography variant="subtitle1"  fontWeight={"bold"}>
           {name}
         </Typography>
       </Box>
@@ -165,11 +169,11 @@ function InfoBody({ changeBody, handleCloseModal, data }) {
           justifyContent: "space-between",
           alignItems: "center",
           marginLeft: "10px",
-          marginBottom: "10px",
-          marginTop: "10px",
+          marginBottom: "6px",
+          marginTop: "6px",
         }}
       >
-        <Typography variant="h6" component="h2" fontWeight={"bold"}>
+        <Typography variant="subtitle1" component="h2" fontWeight={"bold"}>
           Thông tin tài khoản
         </Typography>
         <IconButton onClick={handleCloseModal} sx={{ color: "black" }}>
@@ -274,7 +278,7 @@ function AvatarHome({ changeBody }) {
             />
           </ModalImage>
         </Badge>
-        <Typography variant="h6" component="h2" fontWeight={"bold"}>
+        <Typography  component="h2" fontWeight={"bold"}>
           Đăng Quang
         </Typography>
         <IconButton
@@ -368,7 +372,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
             />
           </Box>
           <Box marginLeft={2}>
-            <Typography variant="h6" component="h2" fontWeight={"bold"}>
+            <Typography fontWeight={"bold"}>
               Ảnh đại diện của bạn
             </Typography>
             <Box>
@@ -417,7 +421,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
                 >
                   <ArrowBackIosNewOutlinedIcon />
                 </IconButton>
-                <Typography variant="h6" component="h2" fontWeight={"bold"}>
+                <Typography fontWeight={"bold"}>
                   Cập nhật ảnh đại diện
                 </Typography>
               </Box>
@@ -518,7 +522,7 @@ function Info() {
   ]
   return (
     <Box marginLeft={2}>
-        <Typography variant="h6" fontWeight={"bold"}>
+        <Typography fontWeight={"bold"}>
           {" "}
           Thông tin cá nhân{" "}
         </Typography>
@@ -574,7 +578,7 @@ function InfoEdit({ changeBody, handleCloseModal }) {
       <Box
         sx={{
           width: "100%",
-          height: "87%",
+          height: "89%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -604,7 +608,7 @@ function InfoEdit({ changeBody, handleCloseModal }) {
             />
           </Box>
           <Box>
-            <Typography variant="h6" component="h2" fontWeight={"bold"}>
+            <Typography fontWeight={"bold"}>
               Giới tính
             </Typography>
             <Box
@@ -839,8 +843,8 @@ function ButtonUpdate({ changeBody }) {
         }}
         onClick={() => changeBody("info_edit")}
       >
-        <BorderColorOutlinedIcon fontSize="medium" />
-        <Typography variant="h6" component="h2" fontWeight={"medium"}>
+        <BorderColorOutlinedIcon  />
+        <Typography  fontWeight={"medium"}>
           Cập nhật
         </Typography>
       </Button>
@@ -873,8 +877,12 @@ function Image() {
   };
 
   return (
-    <Box marginLeft={2}>
-      <Typography variant="h6" fontWeight={"bold"}>
+    <Box marginX={2}
+      sx={{
+        maxHeight: '252px'
+      }}
+    >
+      <Typography fontWeight={"bold"}>
         Hình ảnh
       </Typography>
       <ImageList cols={4} rowHeight={100}>

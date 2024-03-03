@@ -242,9 +242,9 @@ const Messager = () => {
                 <PersonOutlineIcon sx={{ color: "gray" }} />
               </Box>
             </Box>
-            <Button sx={{ marginLeft: "auto", color: "#000", padding: "5px" }}>
-              <GroupAddIcon />
-            </Button>
+            <Box sx={{ marginLeft: "auto", color: "#000", padding: "5px" }}>
+              <CreateGroup />
+            </Box>
             <Button sx={{ marginLeft: "10px", color: "#000", padding: "5px" }}>
               <SearchIcon />
             </Button>
