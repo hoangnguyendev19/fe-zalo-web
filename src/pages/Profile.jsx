@@ -53,10 +53,8 @@ const style = {
 };
 
 export default function Profile() {
-  
   const [openModal, setOpenModal] = useState(false);
-  
-  
+
   const handleOpenModal = () => {
     changeBody("default");
     setOpenModal(true);
@@ -68,7 +66,7 @@ export default function Profile() {
   };
 
   return (
-    <div>
+    <Box>
       <ListItemButton onClick={handleOpenModal}>
         <Box sx={{ marginRight: "10px" }}>
           <PersonOutlineIcon />
@@ -116,7 +114,7 @@ export default function Profile() {
           )}
         </Box>
       </Modal>
-    </div>
+    </Box>
   );
 }
 function HeaderModal({ name, changeBody, back, handleCloseModal }) {
@@ -147,7 +145,7 @@ function HeaderModal({ name, changeBody, back, handleCloseModal }) {
         >
           <ArrowBackIosNewOutlinedIcon />
         </IconButton>
-        <Typography variant="subtitle1"  fontWeight={"bold"}>
+        <Typography variant="subtitle1" fontWeight={"bold"}>
           {name}
         </Typography>
       </Box>
@@ -159,7 +157,6 @@ function HeaderModal({ name, changeBody, back, handleCloseModal }) {
 }
 
 function InfoBody({ changeBody, handleCloseModal, data }) {
-  
   return (
     <>
       {/* Title */}
@@ -199,7 +196,7 @@ function InfoBody({ changeBody, handleCloseModal, data }) {
         <hr style={{ border: "1px solid #A0A0A0" }} />
       </Box>
       {/* Chức năng xử lí thêm */}
-      <AnotherFunctions changeBody={changeBody}/>
+      <AnotherFunctions changeBody={changeBody} />
       {/* line break */}
       <Box sx={{ marginBottom: "10px" }}>
         <hr style={{ border: "1px solid #A0A0A0" }} />
@@ -278,7 +275,7 @@ function AvatarHome({ changeBody }) {
             />
           </ModalImage>
         </Badge>
-        <Typography  component="h2" fontWeight={"bold"}>
+        <Typography component="h2" fontWeight={"bold"}>
           Đăng Quang
         </Typography>
         <IconButton
@@ -372,9 +369,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
             />
           </Box>
           <Box marginLeft={2}>
-            <Typography fontWeight={"bold"}>
-              Ảnh đại diện của bạn
-            </Typography>
+            <Typography fontWeight={"bold"}>Ảnh đại diện của bạn</Typography>
             <Box>
               <Avatar
                 src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -514,43 +509,34 @@ function ImageUploader({ changeBody, handleCloseModal }) {
 function Info() {
   const data = [
     {
-      name: 'Đăng Quang',
-      gender: 'Nam',
-      date: '20/12/2000',
-      phone: '090225252'
-    }
-  ]
+      name: "Đăng Quang",
+      gender: "Nam",
+      date: "20/12/2000",
+      phone: "090225252",
+    },
+  ];
   return (
     <Box marginLeft={2}>
-        <Typography fontWeight={"bold"}>
-          {" "}
-          Thông tin cá nhân{" "}
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <Typography variant="body1" sx={{ color: "gray" }}>
-              Giới tính
-            </Typography>
-            <Typography variant="body1" sx={{ color: "gray" }}>
-              Ngày sinh
-            </Typography>
-            <Typography variant="body1" sx={{ color: "gray" }}>
-              Điện thoại
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body1"> 
-              {data[0].name}
-            </Typography>
-            <Typography variant="body1">
-              {data[0].date}
-            </Typography>
-            <Typography variant="body1">
-              {data[0].phone}
-            </Typography>
-          </Grid>
+      <Typography fontWeight={"bold"}> Thông tin cá nhân </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <Typography variant="body1" sx={{ color: "gray" }}>
+            Giới tính
+          </Typography>
+          <Typography variant="body1" sx={{ color: "gray" }}>
+            Ngày sinh
+          </Typography>
+          <Typography variant="body1" sx={{ color: "gray" }}>
+            Điện thoại
+          </Typography>
         </Grid>
-      </Box>
+        <Grid item>
+          <Typography variant="body1">{data[0].name}</Typography>
+          <Typography variant="body1">{data[0].date}</Typography>
+          <Typography variant="body1">{data[0].phone}</Typography>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 function InfoEdit({ changeBody, handleCloseModal }) {
@@ -608,9 +594,7 @@ function InfoEdit({ changeBody, handleCloseModal }) {
             />
           </Box>
           <Box>
-            <Typography fontWeight={"bold"}>
-              Giới tính
-            </Typography>
+            <Typography fontWeight={"bold"}>Giới tính</Typography>
             <Box
               sx={{
                 display: "flex",
@@ -700,22 +684,22 @@ function InfoEdit({ changeBody, handleCloseModal }) {
     </Box>
   );
 }
-function AnotherFunctions({ changeBody}) {
+function AnotherFunctions({ changeBody }) {
   return (
     <List>
-        <ListItemButton onClick={() => changeBody("group_chat")}>
-          <GroupOutlinedIcon sx={{ marginRight: 2 }} />
-          <Typography>Nhóm chung</Typography>
-        </ListItemButton>
-        <ListItemButton>
-          <BlockOutlinedIcon sx={{ marginRight: 2 }} />
-          <Typography>Chặn tin nhắn</Typography>
-        </ListItemButton>
-        <ListItemButton>
-          <DeleteOutlineOutlinedIcon sx={{ marginRight: 2 }} />
-          <Typography>Xoá bạn bè</Typography>
-        </ListItemButton>
-      </List>
+      <ListItemButton onClick={() => changeBody("group_chat")}>
+        <GroupOutlinedIcon sx={{ marginRight: 2 }} />
+        <Typography>Nhóm chung</Typography>
+      </ListItemButton>
+      <ListItemButton>
+        <BlockOutlinedIcon sx={{ marginRight: 2 }} />
+        <Typography>Chặn tin nhắn</Typography>
+      </ListItemButton>
+      <ListItemButton>
+        <DeleteOutlineOutlinedIcon sx={{ marginRight: 2 }} />
+        <Typography>Xoá bạn bè</Typography>
+      </ListItemButton>
+    </List>
   );
 }
 function GroupChat({ changeBody, handleCloseModal }) {
@@ -833,35 +817,32 @@ function GroupChat({ changeBody, handleCloseModal }) {
 function ButtonUpdate({ changeBody }) {
   return (
     <Button
-        style={{
-          display: "flex", 
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100%",
-          color: "black",
-          textTransform: "none",
-        }}
-        onClick={() => changeBody("info_edit")}
-      >
-        <BorderColorOutlinedIcon  />
-        <Typography  fontWeight={"medium"}>
-          Cập nhật
-        </Typography>
-      </Button>
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        color: "black",
+        textTransform: "none",
+      }}
+      onClick={() => changeBody("info_edit")}
+    >
+      <BorderColorOutlinedIcon />
+      <Typography fontWeight={"medium"}>Cập nhật</Typography>
+    </Button>
   );
-}  
+}
 function Image() {
-  
   const [data, setData] = useState([]);
- 
+
   useLayoutEffect(() => {
     const fetchData = async () => {
       const result = await axios.get(
         "https://65cdef30c715428e8b3f82d1.mockapi.io/person"
       );
       setData(result.data[0].picture);
-      };
-      fetchData();
+    };
+    fetchData();
   }, []);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -877,14 +858,13 @@ function Image() {
   };
 
   return (
-    <Box marginX={2}
+    <Box
+      marginX={2}
       sx={{
-        maxHeight: '252px'
+        maxHeight: "252px",
       }}
     >
-      <Typography fontWeight={"bold"}>
-        Hình ảnh
-      </Typography>
+      <Typography fontWeight={"bold"}>Hình ảnh</Typography>
       <ImageList cols={4} rowHeight={100}>
         {data.map((src, index) => (
           <ImageListItem key={index}>

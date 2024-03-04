@@ -5,51 +5,19 @@ import {
   Tab,
   Tabs,
   TextField,
-  Button,
   List,
-  Avatar,
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import CardItemUser from "../components/CardItemUser";
 import CardItemGroup from "../components/CardItemGroup";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import VideocamIcon from "@mui/icons-material/Videocam";
-import ImageIcon from "@mui/icons-material/Image";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
-import ListMessages from '../components/ListMessages'
 import AddFriend from "../components/AddFriend";
 import CreateGroup from "../components/CreateGroup";
 import { useState } from "react";
-
-const listUser = [
-  {
-    id: 1,
-    fullName: "Nguyen Huy Hoang",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 2,
-    fullName: "Do Chi Tuong",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 3,
-    fullName: "Truong Duong Minh Nhat",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 4,
-    fullName: "Nguyen Ho Dang Quang",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-];
+import { useSelector } from "react-redux";
+import Chat from "../components/Chat";
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import { Carousel } from "react-responsive-carousel";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -78,21 +46,24 @@ function a11yProps(index) {
 
 const Messager = () => {
   const [value, setValue] = useState(0);
-  const [indexMessage, setIndexMessage] = useState(1);
-
-  const handleClickMessage = (value) => {
-    console.log('Value: ', value)
-    setIndexMessage(value)
-  }
+  const { conversations } = useSelector((state) => state.conversation);
+  const [conversation, setConversation] = useState(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
   return (
-    <>
+    <Grid container item xs={11.3}>
       <Grid item xs={3}>
-        <Box sx={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: "20px",
+            marginRight: "10px",
+          }}
+        >
           <TextField
             placeholder="Tìm kiếm"
             InputProps={{
@@ -110,7 +81,7 @@ const Messager = () => {
             <AddFriend />
           </Box>
           <Box sx={{ marginLeft: "5px" }}>
-           <CreateGroup />
+            <CreateGroup />
           </Box>
         </Box>
         <Box sx={{ width: "100%", marginTop: "10px" }}>
@@ -129,158 +100,91 @@ const Messager = () => {
             </Tabs>
           </Box>
           <CustomTabPanel value={value} index={0}>
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Nguyen Huy Hoang"
-              message="Dang dau v"
-              handleClickMessage={() => handleClickMessage(1)}
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Do Chi Tuong"
-              message="Chua co tin nhan"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Minh Nhat"
-              message="An gi chua ?"
-            />
-            <CardItemGroup
-              listUser={listUser}
-              name="IUH_CNM_2023ssssssssssssss"
-              message="Chua co tin nhansssssssssssssssssssssssssssss"
-              handleClickMessage={() => handleClickMessage(2)}
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Do Chi Tuong"
-              message="Chua co tin nhan"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Minh Nhat"
-              message="An gi chua ?"
-            />
-            <CardItemGroup
-              listUser={listUser}
-              name="IUH_CNM_2023ssssssssssssss"
-              message="Chua co tin nhansssssssssssssssssssssssssssss"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Do Chi Tuong"
-              message="Chua co tin nhan"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Minh Nhat"
-              message="An gi chua ?"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Nguyen Huy Hoang"
-              message="Dang dau v"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Do Chi Tuong"
-              message="Chua co tin nhan"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Minh Nhat"
-              message="An gi chua ?"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Nguyen Huy Hoang"
-              message="Dang dau v"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Do Chi Tuong"
-              message="Chua co tin nhan"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Minh Nhat"
-              message="An gi chua ?"
-            />
+            {conversations &&
+              conversations.map((conver) => {
+                if (conver.type === "FRIEND") {
+                  return (
+                    <CardItemUser
+                      key={conver.id}
+                      conver={conver}
+                      setConversation={setConversation}
+                    />
+                  );
+                } else {
+                  return (
+                    <CardItemGroup
+                      key={conver.id}
+                      conver={conver}
+                      setConversation={setConversation}
+                    />
+                  );
+                }
+              })}
           </CustomTabPanel>
           <CustomTabPanel value={value} index={1}>
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Nguyen Huy Hoang"
-              message="Dang dau v"
-            />
-            <CardItemUser
-              avatarUrl="https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              name="Do Chi Tuong"
-              message="Chua co tin nhan"
-            />
+            <Typography>Không có tin nhắn chưa đọc</Typography>
           </CustomTabPanel>
         </Box>
       </Grid>
-      <Grid item xs={8.3} sx={{}}>
-        <Box>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              padding: "20px 0",
-            }}
-          >
-            <Box sx={{ marginRight: "10px" }}>
-              <Avatar
-                alt="Nguyen Huy Hoang"
-                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              />
-            </Box>
-            <Box>
-              <Typography fontWeight="bold">Nguyen Huy Hoang</Typography>
-              <Box>
-                <PersonOutlineIcon sx={{ color: "gray" }} />
+      <Grid
+        item
+        xs={8.7}
+        sx={{
+          borderLeftWidth: 1,
+          borderLeftColor: "rgba(0,0,0,0.3)",
+          borderLeftStyle: "solid",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {conversation ? (
+          <Chat conversation={conversation} />
+        ) : (
+          <Box>
+            <Carousel
+              showThumbs={false}
+              showStatus={false}
+              showArrows={false}
+              autoPlay={true}
+              transitionTime={1000}
+            >
+              <Box sx={{ paddingX: "100px" }}>
+                <img
+                  src="https://res.cloudinary.com/dthusmigo/image/upload/v1709463995/STORAGE/img-banner-1_dh34vj.png"
+                  style={{ width: "100%", height: 400 }}
+                />
               </Box>
-            </Box>
-            <Box sx={{ marginLeft: "auto", color: "#000", padding: "5px" }}>
-              <CreateGroup />
-            </Box>
-            <Button sx={{ marginLeft: "10px", color: "#000", padding: "5px" }}>
-              <SearchIcon />
-            </Button>
-            <Button sx={{ marginLeft: "10px", color: "#000", padding: "5px" }}>
-              <VideocamIcon />
-            </Button>
+              <Box sx={{ paddingX: "100px" }}>
+                <img
+                  src="https://res.cloudinary.com/dthusmigo/image/upload/v1709463996/STORAGE/img-banner-2_cbydkf.jpg"
+                  style={{ width: "100%", height: 400 }}
+                />
+              </Box>
+              <Box sx={{ paddingX: "100px" }}>
+                <img
+                  src="https://res.cloudinary.com/dthusmigo/image/upload/v1709463996/STORAGE/img-banner-3_hcu9bi.jpg"
+                  style={{ width: "100%", height: 400 }}
+                />
+              </Box>
+              <Box sx={{ paddingX: "100px" }}>
+                <img
+                  src="https://res.cloudinary.com/dthusmigo/image/upload/v1709463996/STORAGE/img-banner-4_nhj93s.jpg"
+                  style={{ width: "100%", height: 400 }}
+                />
+              </Box>
+              <Box sx={{ paddingX: "100px" }}>
+                <img
+                  src="https://res.cloudinary.com/dthusmigo/image/upload/v1709463996/STORAGE/img-banner-5_lu9cbv.jpg"
+                  style={{ width: "100%", height: 400 }}
+                />
+              </Box>
+            </Carousel>
           </Box>
-        </Box>
-        <Box sx={{ maxHeight: "500px", overflow: "auto" }}>
-
-          { /* Show list messages from the personal chat or group chat */}
-          <Box sx={{ backgroundColor: "#ccc", height: "800px" }}>
-            <ListMessages data={indexMessage}/>
-          </Box>
-
-        </Box>
-        <Box>
-          <Box sx={{ display: "flex", alignItems: "center", padding: "5px 0" }}>
-            <Button sx={{ color: "#000" }}>
-              <ImageIcon />
-            </Button>
-            <Button sx={{ color: "#000" }}>
-              <AttachFileIcon />
-            </Button>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <TextField
-              placeholder="Nhập tin nhắn"
-              variant="outlined"
-              fullWidth
-            />
-            <Button size="large">Gửi</Button>
-          </Box>
-        </Box>
+        )}
       </Grid>
-    </>
+    </Grid>
   );
 };
 

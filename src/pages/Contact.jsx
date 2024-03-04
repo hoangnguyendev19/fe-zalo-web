@@ -85,7 +85,7 @@ const Contact = () => {
   };
 
   return (
-    <>
+    <Grid container item xs={11.3}>
       <Grid item xs={3}>
         <Box sx={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
           <TextField
@@ -96,7 +96,7 @@ const Contact = () => {
                   <SearchIcon />
                 </InputAdornment>
               ),
-            }} 
+            }}
             variant="outlined"
             size="small"
             fullWidth
@@ -163,11 +163,11 @@ const Contact = () => {
         </Box>
       </Grid>
       <Grid item xs={8.3}>
-        {show === "ListFriend" && <ListFriend  />}
-        {show === "ListGroup" && <ListGroup  />}
+        {show === "ListFriend" && <ListFriend />}
+        {show === "ListGroup" && <ListGroup />}
         {show === "RequestFriend" && <RequestFriend />}
       </Grid>
-    </>
+    </Grid>
   );
 };
 
