@@ -7,7 +7,9 @@ import {
   Typography,
 } from "@mui/material";
 
-const CardItemGroup = ({ listUser, name, message, handleClickMessage }) => {
+const CardItemGroup = ({ conver, setConversation }) => {
+  let { name, members, admin, type, id } = conver;
+
   return (
     <ListItem sx={{ padding: "0px" }}>
       <ListItemButton
@@ -16,17 +18,13 @@ const CardItemGroup = ({ listUser, name, message, handleClickMessage }) => {
           paddingLeft: "5px",
           paddingRight: "0px",
         }}
-        onClick={handleClickMessage}
+        onClick={() => setConversation(conver)}
       >
         <Box sx={{ marginRight: "10px" }}>
           <AvatarGroup max={2}>
-            {listUser.length > 0 &&
-              listUser.map((user) => (
-                <Avatar
-                  key={user.id}
-                  alt={user.fullName}
-                  src={user.avatarUrl}
-                />
+            {members?.length > 0 &&
+              members?.map((mem) => (
+                <Avatar key={mem.id} alt={mem.fullName} src={mem.avatarUrl} />
               ))}
           </AvatarGroup>
         </Box>
@@ -50,7 +48,7 @@ const CardItemGroup = ({ listUser, name, message, handleClickMessage }) => {
               textOverflow: "ellipsis",
             }}
           >
-            {message}
+            Toi dang an com
           </Typography>
         </Box>
       </ListItemButton>
