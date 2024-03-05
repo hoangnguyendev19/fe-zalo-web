@@ -17,10 +17,13 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { useState, lazy, Suspense, useEffect } from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Loading from "../components/Loading";
-import Profile from "./Profile";
+import Profile from "../components/Profile";
 import { useDispatch, useSelector } from "react-redux";
 import ConversationAPI from "../api/ConversationAPI";
 import { getAllConversations } from "../redux/conversationSlice";
+import UserAPI from "../api/UserAPI";
+import { logout } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Messager = lazy(() => import("./Messager"));
 const Contact = lazy(() => import("./Contact"));
@@ -28,6 +31,7 @@ const Contact = lazy(() => import("./Contact"));
 const Home = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { accessToken } = useSelector((state) => state.user);
 
   const [showMess, setShowMess] = useState(true);
@@ -52,6 +56,12 @@ const Home = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    await UserAPI.logout();
+    dispatch(logout());
+    navigate("/");
   };
 
   return (
@@ -151,7 +161,7 @@ const Home = () => {
                         </ListItemButton>
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
-                        <ListItemButton>
+                        <ListItemButton onClick={handleLogout}>
                           <Box sx={{ marginRight: "10px" }}>
                             <LogoutIcon />
                           </Box>

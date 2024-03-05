@@ -5,8 +5,15 @@ import {
   Avatar,
   Typography,
   AvatarGroup,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  Divider,
+  Drawer,
+  ListItemIcon,
+  CircularProgress,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ImageIcon from "@mui/icons-material/Image";
@@ -18,6 +25,11 @@ import MessageSender from "./MessageSender";
 import MessageReceiver from "./MessageReceiver";
 import MessageAPI from "../api/MessageAPI";
 import { io } from "socket.io-client";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import DehazeIcon from "@mui/icons-material/Dehaze";
+import UploadAPI from "../api/UploadAPI";
 
 const Chat = ({ conversation }) => {
   const { name, members, admin, type, id } = conversation;
@@ -27,7 +39,71 @@ const Chat = ({ conversation }) => {
   const [socket, setSocket] = useState(null);
   const [content, setContent] = useState("");
   const [typeMsg, setTypeMsg] = useState("TEXT"); // TEXT - IMAGE - FILE - VIDEO
-  const [image, setImage] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
+  };
+
+  const DrawerList = (
+    <Box sx={{ width: 400 }} role="presentation" onClick={toggleDrawer(false)}>
+      <Typography
+        textAlign="center"
+        fontWeight="bold"
+        paddingTop="20px"
+        paddingBottom="20px"
+        fontSize="20px"
+      >
+        Thông tin hội thoại
+      </Typography>
+      <Divider />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "20px 0",
+        }}
+      >
+        {friend?.avatarUrl ? (
+          <Avatar
+            src={friend.avatarUrl}
+            alt="avatar"
+            sx={{ width: 60, height: 60 }}
+          />
+        ) : (
+          <Avatar sx={{ width: 60, height: 60 }}>{friend.fullName}</Avatar>
+        )}
+        <Typography
+          textAlign="center"
+          paddingTop="10px"
+          fontWeight="bold"
+          fontSize="18px"
+        >
+          {friend.fullName}
+        </Typography>
+      </Box>
+      <Divider />
+      <List>
+        {["Thông tin cá nhân", "Tắt thông báo", "Xoá cuộc trò chuyện"].map(
+          (text, index) => (
+            <ListItem key={text} disablePadding>
+              <ListItemButton sx={{ color: index === 2 ? "red" : "inherit" }}>
+                <ListItemIcon>
+                  {index === 0 && <AccountCircleIcon />}
+                  {index === 1 && <NotificationsOffIcon />}
+                  {index === 2 && <DeleteIcon color="error" />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          )
+        )}
+      </List>
+    </Box>
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -165,6 +241,27 @@ const Chat = ({ conversation }) => {
     }
   };
 
+  const handleSendImage = async (event) => {
+    setLoading(true);
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    const imageUrl = await UploadAPI.uploadFile(formData);
+
+    if (imageUrl) {
+      const message = {
+        content: imageUrl,
+        type: "IMAGE",
+        conversationId: conversation.id,
+        senderId: user.id,
+      };
+      if (socket) {
+        socket.emit("send_message", message);
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <Box sx={{ width: "100%", height: "100%", paddingLeft: "30px" }}>
       <Box>
@@ -202,13 +299,13 @@ const Chat = ({ conversation }) => {
             </Box>
           </Box>
           <Box sx={{ marginLeft: "auto", color: "#000", padding: "5px" }}>
-            <CreateGroup />
-          </Box>
-          <Button sx={{ marginLeft: "10px", color: "#000", padding: "5px" }}>
-            <SearchIcon />
-          </Button>
-          <Button sx={{ marginLeft: "10px", color: "#000", padding: "5px" }}>
             <VideocamIcon />
+          </Box>
+          <Button
+            sx={{ marginLeft: "10px", color: "#000", padding: "5px" }}
+            onClick={toggleDrawer(true)}
+          >
+            <DehazeIcon />
           </Button>
         </Box>
       </Box>
@@ -246,9 +343,18 @@ const Chat = ({ conversation }) => {
       </Box>
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", padding: "5px 0" }}>
-          <Button sx={{ color: "#000" }}>
-            <ImageIcon />
-          </Button>
+          <Box sx={{ padding: "0px 20px" }}>
+            <label htmlFor="upload">
+              <ImageIcon />
+            </label>
+            <input
+              id="upload"
+              type="file"
+              accept="image/*"
+              style={{ display: "none", padding: "10px" }}
+              onChange={handleSendImage}
+            />
+          </Box>
           <Button sx={{ color: "#000" }}>
             <AttachFileIcon />
           </Button>
@@ -261,11 +367,24 @@ const Chat = ({ conversation }) => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
           />
-          <Button size="large" onClick={handleSendMessage}>
+          <Button
+            size="large"
+            style={{ padding: "15px 20px" }}
+            variant="outlined"
+            onClick={handleSendMessage}
+          >
             Gửi
+            {loading && (
+              <Box sx={{ display: "flex", marginLeft: "5px" }}>
+                <CircularProgress color="inherit" size="20px" />
+              </Box>
+            )}
           </Button>
         </Box>
       </Box>
+      <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
+        {DrawerList}
+      </Drawer>
     </Box>
   );
 };

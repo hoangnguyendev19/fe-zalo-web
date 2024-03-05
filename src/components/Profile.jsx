@@ -16,6 +16,7 @@ import {
   ImageListItem,
   AvatarGroup,
   Slider,
+  CircularProgress,
 } from "@mui/material";
 
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
@@ -28,11 +29,20 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import ModalImage from "../components/ModalImage";
+import ModalImage from "./ModalImage";
 import axios from "axios";
 import { useEffect, useState, useRef, memo, useLayoutEffect } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { Await } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  convertDateToDateObj,
+  convertToDate,
+  convertToDateTime,
+} from "../utils";
+import UserAPI from "../api/UserAPI";
+import UploadAPI from "../api/UploadAPI";
+import { setUser } from "../redux/userSlice";
 
 const style = {
   position: "absolute",
@@ -42,7 +52,7 @@ const style = {
   width: 400,
   height: "550px",
   bgcolor: "background.paper",
-  // border: "2px solid #000",
+  borderRadius: "5px",
   boxShadow: 24,
   overflowY: "auto",
   // hide scrollbar
@@ -54,6 +64,7 @@ const style = {
 
 export default function Profile() {
   const [openModal, setOpenModal] = useState(false);
+  const { user } = useSelector((state) => state.user);
 
   const handleOpenModal = () => {
     changeBody("default");
@@ -84,12 +95,19 @@ export default function Profile() {
           {/* Modal navigation */}
           {body === "default" && (
             <InfoBody
+              user={user}
               changeBody={changeBody}
               handleCloseModal={handleCloseModal}
             />
           )}
           {body === "avatar_editor" && (
             <AvatarEdit
+              changeBody={changeBody}
+              handleCloseModal={handleCloseModal}
+            />
+          )}
+          {body === "image_editor" && (
+            <ImageEdit
               changeBody={changeBody}
               handleCloseModal={handleCloseModal}
             />
@@ -106,17 +124,12 @@ export default function Profile() {
               handleCloseModal={handleCloseModal}
             />
           )}
-          {body === "group_chat" && (
-            <GroupChat
-              changeBody={changeBody}
-              handleCloseModal={handleCloseModal}
-            />
-          )}
         </Box>
       </Modal>
     </Box>
   );
 }
+
 function HeaderModal({ name, changeBody, back, handleCloseModal }) {
   return (
     <Box
@@ -156,7 +169,7 @@ function HeaderModal({ name, changeBody, back, handleCloseModal }) {
   );
 }
 
-function InfoBody({ changeBody, handleCloseModal, data }) {
+function InfoBody({ changeBody, handleCloseModal, user }) {
   return (
     <>
       {/* Title */}
@@ -178,50 +191,71 @@ function InfoBody({ changeBody, handleCloseModal, data }) {
         </IconButton>
       </Box>
       {/* Avatar */}
-      <AvatarHome changeBody={changeBody} />
+      <AvatarHome
+        fullName={user?.fullName ? user.fullName : ""}
+        avatarUrl={user?.avatarUrl ? user.avatarUrl : ""}
+        coverImage={user?.coverImage ? user.coverImage : ""}
+        changeBody={changeBody}
+      />
       {/* line break */}
       <Box sx={{ marginBottom: "10px" }}>
-        <hr style={{ border: "1px solid #A0A0A0" }} />
+        <hr style={{ border: "4px solid rgba(0,0,0,0.1)" }} />
       </Box>
       {/* Thông tin cá nhân */}
-      <Info />
+      <Info
+        gender={user?.gender ? "Nam" : "Nữ"}
+        dateOfBirth={
+          user?.dateOfBirth ? user.dateOfBirth : new Date().getTime()
+        }
+        phoneNumber={user?.phoneNumber ? user.phoneNumber : ""}
+      />
       {/* line break */}
       <Box sx={{ marginBottom: "10px" }}>
-        <hr style={{ border: "1px solid #A0A0A0" }} />
-      </Box>
-      {/* Hình ảnh */}
-      <Image />
-      {/* line break */}
-      <Box sx={{ marginBottom: "10px" }}>
-        <hr style={{ border: "1px solid #A0A0A0" }} />
-      </Box>
-      {/* Chức năng xử lí thêm */}
-      <AnotherFunctions changeBody={changeBody} />
-      {/* line break */}
-      <Box sx={{ marginBottom: "10px" }}>
-        <hr style={{ border: "1px solid #A0A0A0" }} />
+        <hr style={{ border: "1px solid rgba(0,0,0,0.1)" }} />
       </Box>
       {/* Cập nhật */}
       <ButtonUpdate changeBody={changeBody} />
     </>
   );
 }
-function AvatarHome({ changeBody }) {
+
+function AvatarHome({ fullName, avatarUrl, coverImage, changeBody }) {
   return (
     <>
       <Box>
-        <ModalImage
-          isImage={true}
-          srcs="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="bla bla"
-          styleOrigin={{ width: "100%", height: 160, objectFit: "cover" }}
+        <Badge
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          badgeContent={
+            <Button
+              sx={{
+                minWidth: 0,
+                padding: "5px",
+                borderRadius: "50%",
+                border: "1px solid #fff",
+                position: "relative",
+                right: "25px",
+                bottom: "25px",
+              }}
+              variant="rounded"
+              onClick={() => changeBody("image_editor")}
+            >
+              <CameraEnhanceOutlinedIcon sx={{ color: "#fff" }} />
+            </Button>
+          }
+          style={{ width: "100%" }}
         >
-          <img
-            src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="bla bla"
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-          />
-        </ModalImage>
+          <Box sx={{ width: "100%" }}>
+            <img
+              src={coverImage}
+              alt="load"
+              style={{
+                width: "100%",
+                height: "180px",
+                objectFit: "cover",
+              }}
+            />
+          </Box>
+        </Badge>
       </Box>
       <Box
         sx={{
@@ -256,16 +290,16 @@ function AvatarHome({ changeBody }) {
         >
           <ModalImage
             isOpen={false}
-            srcs="/static/images/avatar/2.jpg"
+            srcs={avatarUrl}
             alt="load"
             styleOrigin={{
-              width: 70,
-              height: 70,
+              width: 90,
+              height: 90,
               border: "1px solid #fff",
             }}
           >
             <img
-              src="/static/images/avatar/2.jpg"
+              src={avatarUrl}
               alt="load"
               style={{
                 width: "100%",
@@ -276,7 +310,7 @@ function AvatarHome({ changeBody }) {
           </ModalImage>
         </Badge>
         <Typography component="h2" fontWeight={"bold"}>
-          Đăng Quang
+          {fullName}
         </Typography>
         <IconButton
           sx={{ minWidth: 0, padding: 0 }}
@@ -288,8 +322,8 @@ function AvatarHome({ changeBody }) {
     </>
   );
 }
+
 function AvatarEdit({ changeBody, handleCloseModal }) {
-  const updateAvatar = (imageUrl) => {};
   return (
     <>
       <Box sx={{ ...style }}>
@@ -300,7 +334,7 @@ function AvatarEdit({ changeBody, handleCloseModal }) {
           handleCloseModal={handleCloseModal}
         />
         <Box>
-          <ImageUploader
+          <AvatarUploader
             changeBody={changeBody}
             handleCloseModal={handleCloseModal}
           />
@@ -310,12 +344,36 @@ function AvatarEdit({ changeBody, handleCloseModal }) {
     </>
   );
 }
-function ImageUploader({ changeBody, handleCloseModal }) {
+
+function ImageEdit({ changeBody, handleCloseModal }) {
+  return (
+    <>
+      <Box sx={{ ...style }}>
+        <HeaderModal
+          name="Cập nhật ảnh bìa"
+          changeBody={changeBody}
+          back="default"
+          handleCloseModal={handleCloseModal}
+        />
+        <Box>
+          <ImageUploader
+            changeBody={changeBody}
+            handleCloseModal={handleCloseModal}
+          />
+        </Box>
+      </Box>
+    </>
+  );
+}
+
+function AvatarUploader({ changeBody, handleCloseModal }) {
   const [open, setOpen] = useState(false); // Hiển thị
-  const [image, setImage] = useState(null);
-  const inputRef = useRef();
-  const canvasRef = useRef();
+  const [imageUri, setImageUri] = useState(null);
+  const [fileImg, setFileImg] = useState();
   const [scale, setScale] = useState(1.2);
+  const { user, accessToken } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const handleScaleChange = (event, newValue) => {
     setScale(newValue);
@@ -324,17 +382,33 @@ function ImageUploader({ changeBody, handleCloseModal }) {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
-    setImage(url);
+    setFileImg(file);
+    setImageUri(url);
     setOpen(true);
-    // changeBody("image_uploader");
   };
 
-  const handleSave = () => {
-    const canvas = canvasRef.current;
-    const dataURL = canvas.toDataURL();
-    const file = dataURLtoFile(dataURL, "avatar.png");
-    console.log(file);
+  const handleUpdateAvatar = async () => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("file", fileImg);
+    const avatarUrl = await UploadAPI.uploadFile(formData);
+    if (avatarUrl) {
+      const newUser = {
+        fullName: user.fullName,
+        gender: user?.gender,
+        dateOfBirth: user?.dateOfBirth,
+        avatarUrl,
+        coverImage: user?.coverImage,
+      };
+      const data = await UserAPI.updateMe(newUser, accessToken);
+      if (data) {
+        dispatch(setUser(data));
+        setLoading(false);
+        changeBody("default");
+      }
+    }
   };
+
   return (
     <Box>
       {!open && (
@@ -361,7 +435,6 @@ function ImageUploader({ changeBody, handleCloseModal }) {
             </label>
             <input
               id="upload"
-              ref={inputRef}
               type="file"
               accept="image/*"
               style={{ display: "none", padding: "10px 10px" }}
@@ -370,11 +443,20 @@ function ImageUploader({ changeBody, handleCloseModal }) {
           </Box>
           <Box marginLeft={2}>
             <Typography fontWeight={"bold"}>Ảnh đại diện của bạn</Typography>
-            <Box>
+            <Box
+              sx={{
+                marginTop: "60px",
+              }}
+            >
               <Avatar
-                src="https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                alt="bla bla"
-                style={{ width: 70, height: 70, border: "1px solid #fff" }}
+                src={user?.avatarUrl ? user.avatarUrl : ""}
+                alt="avatar"
+                style={{
+                  width: 200,
+                  height: 200,
+                  border: "1px solid #fff",
+                  margin: "0 auto",
+                }}
               />
             </Box>
           </Box>
@@ -425,7 +507,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
               </IconButton>
             </Box>
             <Box />
-            {image && (
+            {imageUri && (
               <Box
                 sx={{
                   display: "flex",
@@ -436,7 +518,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
                 }}
               >
                 <AvatarEditor
-                  image={image}
+                  image={imageUri}
                   width={250}
                   height={250}
                   border={50}
@@ -474,85 +556,316 @@ function ImageUploader({ changeBody, handleCloseModal }) {
               marginRight: "10px",
             }}
           >
-            <button
-              style={{
-                backgroundColor: "#EAEDF0",
-                color: "#38485B",
-                fontSize: "1.2rem",
-                border: "none",
-                padding: "8px 16px",
-              }}
-              onClick={() => setOpen(false)}
-            >
+            <Button variant="outlined" onClick={() => setOpen(false)}>
               Huỷ
-            </button>
-            <button
-              onClick={() => {
-                setOpen(false);
-              }}
-              style={{
-                backgroundColor: "#0068FF",
-                color: "white",
-                fontSize: "1.2rem",
-                border: "none",
-                padding: "8px 16px",
-              }}
-            >
+            </Button>
+            <Button onClick={handleUpdateAvatar} variant="contained">
               Cập nhật
-            </button>
+              {loading && (
+                <Box sx={{ display: "flex", marginLeft: "5px" }}>
+                  <CircularProgress color="inherit" size="20px" />
+                </Box>
+              )}
+            </Button>
           </Box>
         </Box>
       )}
     </Box>
   );
 }
-function Info() {
-  const data = [
-    {
-      name: "Đăng Quang",
-      gender: "Nam",
-      date: "20/12/2000",
-      phone: "090225252",
-    },
-  ];
+
+function ImageUploader({ changeBody, handleCloseModal }) {
+  const [open, setOpen] = useState(false); // Hiển thị
+  const [imageUri, setImageUri] = useState(null);
+  const [fileImg, setFileImg] = useState();
+  const [scale, setScale] = useState(1.2);
+  const { user, accessToken } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+
+  const handleScaleChange = (event, newValue) => {
+    setScale(newValue);
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    const url = URL.createObjectURL(file);
+    setFileImg(file);
+    setImageUri(url);
+    setOpen(true);
+  };
+
+  const handleUpdateImage = async () => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("file", fileImg);
+    const imageUrl = await UploadAPI.uploadFile(formData);
+    if (imageUrl) {
+      const newUser = {
+        fullName: user.fullName,
+        gender: user?.gender,
+        dateOfBirth: user?.dateOfBirth,
+        avatarUrl: user?.avatarUrl,
+        coverImage: imageUrl,
+      };
+      const data = await UserAPI.updateMe(newUser, accessToken);
+      if (data) {
+        dispatch(setUser(data));
+        setLoading(false);
+        changeBody("default");
+      }
+    }
+  };
+
+  return (
+    <Box>
+      {!open && (
+        <Box>
+          <Box>
+            <label
+              htmlFor="upload"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "10px 15px",
+                margin: "10px 10px",
+                borderRadius: "3px",
+                cursor: "pointer",
+                backgroundColor: "rgb(229, 239, 255)",
+                color: "rgb(0, 90, 224)",
+                fontWeight: 500,
+                fontSize: "18px",
+              }}
+            >
+              <ImageOutlinedIcon />
+              Tải ảnh từ máy lên
+            </label>
+            <input
+              id="upload"
+              type="file"
+              accept="image/*"
+              style={{ display: "none", padding: "10px 10px" }}
+              onChange={handleFileChange}
+            />
+          </Box>
+          <Box marginLeft={2}>
+            <Typography fontWeight={"bold"}>Ảnh bìa của bạn</Typography>
+            <Box
+              sx={{
+                marginTop: "60px",
+              }}
+            >
+              <img
+                src={user?.coverImage ? user.coverImage : ""}
+                alt="image"
+                style={{
+                  width: 360,
+                  height: 320,
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
+      )}
+
+      {open && (
+        <Box sx={style}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingBottom: "10px",
+                paddingTop: "10px",
+                paddingRight: "10px",
+                paddingLeft: "2px",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "center",
+                  gap: "3px",
+                }}
+              >
+                <IconButton
+                  onClick={() => {
+                    changeBody("image_editor");
+                    setOpen(false);
+                  }}
+                >
+                  <ArrowBackIosNewOutlinedIcon />
+                </IconButton>
+                <Typography fontWeight={"bold"}>Cập nhật ảnh bìa</Typography>
+              </Box>
+              <IconButton onClick={handleCloseModal} sx={{ color: "black" }}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Box />
+            {imageUri && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <AvatarEditor
+                  image={imageUri}
+                  width={250}
+                  height={250}
+                  border={50}
+                  color={[255, 255, 255, 0.6]} // RGBA
+                  scale={scale}
+                  rotate={0}
+                />
+              </Box>
+            )}
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "30px",
+            }}
+          >
+            <Slider
+              value={scale}
+              min={1}
+              max={3}
+              step={0.1}
+              onChange={handleScaleChange}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "right",
+              alignItems: "center",
+              marginTop: "30px",
+              gap: "10px",
+              marginRight: "10px",
+            }}
+          >
+            <Button variant="outlined" onClick={() => setOpen(false)}>
+              Huỷ
+            </Button>
+            <Button onClick={handleUpdateImage} variant="contained">
+              Cập nhật
+              {loading && (
+                <Box sx={{ display: "flex", marginLeft: "5px" }}>
+                  <CircularProgress color="inherit" size="20px" />
+                </Box>
+              )}
+            </Button>
+          </Box>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+function Info({ gender, dateOfBirth, phoneNumber }) {
   return (
     <Box marginLeft={2}>
-      <Typography fontWeight={"bold"}> Thông tin cá nhân </Typography>
+      <Typography fontWeight={"bold"} fontSize="16px" marginBottom="10px">
+        Thông tin cá nhân
+      </Typography>
       <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <Typography variant="body1" sx={{ color: "gray" }}>
+        <Grid item xs={3}>
+          <Typography
+            variant="body1"
+            sx={{ color: "gray" }}
+            fontSize="14px"
+            marginBottom="10px"
+          >
             Giới tính
           </Typography>
-          <Typography variant="body1" sx={{ color: "gray" }}>
+          <Typography
+            variant="body1"
+            sx={{ color: "gray" }}
+            fontSize="14px"
+            marginBottom="10px"
+          >
             Ngày sinh
           </Typography>
-          <Typography variant="body1" sx={{ color: "gray" }}>
+          <Typography
+            variant="body1"
+            sx={{ color: "gray" }}
+            fontSize="14px"
+            marginBottom="10px"
+          >
             Điện thoại
           </Typography>
         </Grid>
         <Grid item>
-          <Typography variant="body1">{data[0].name}</Typography>
-          <Typography variant="body1">{data[0].date}</Typography>
-          <Typography variant="body1">{data[0].phone}</Typography>
+          <Typography variant="body1" fontSize="14px" marginBottom="10px">
+            {gender}
+          </Typography>
+          <Typography variant="body1" fontSize="14px" marginBottom="10px">
+            {convertToDate(dateOfBirth)}
+          </Typography>
+          <Typography variant="body1" fontSize="14px" marginBottom="10px">
+            {phoneNumber}
+          </Typography>
         </Grid>
       </Grid>
     </Box>
   );
 }
 function InfoEdit({ changeBody, handleCloseModal }) {
-  const [value, setValue] = useState("Đăng Quang");
-  const [checked, setChecked] = useState(true);
-  const [date, setDate] = useState("2022-01-01");
+  const { user, accessToken } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [value, setValue] = useState(user?.fullName ? user.fullName : "");
+  const [gender, setGender] = useState(user?.gender);
+  const [date, setDate] = useState(
+    user?.dateOfBirth
+      ? convertToDateTime(user.dateOfBirth)
+      : convertToDateTime(new Date().getTime())
+  );
 
   const handleChangeDate = (event) => {
     setDate(event.target.value);
   };
   const handleChangeGender = (event) => {
-    setChecked(event.target.checked);
+    if (event.target.value === "male") {
+      setGender(true);
+    } else {
+      setGender(false);
+    }
   };
   const handleChangeName = (event) => {
     setValue(event.target.value);
   };
+
+  const handleChangeProfile = async () => {
+    const newUser = {
+      fullName: value,
+      gender,
+      dateOfBirth: convertDateToDateObj(date),
+      avatarUrl: user?.avatarUrl,
+      coverImage: user?.coverImage,
+    };
+
+    const data = await UserAPI.updateMe(newUser, accessToken);
+    if (data) {
+      dispatch(setUser(data));
+      changeBody("default");
+    }
+  };
+
   return (
     <Box sx={{ ...style }}>
       <HeaderModal
@@ -579,7 +892,9 @@ function InfoEdit({ changeBody, handleCloseModal }) {
           }}
         >
           <Box>
-            <Typography>Tên hiển thị</Typography>
+            <Typography fontSize="14px" marginBottom="10px">
+              Tên hiển thị
+            </Typography>
             <input
               type="text"
               style={{
@@ -594,7 +909,7 @@ function InfoEdit({ changeBody, handleCloseModal }) {
             />
           </Box>
           <Box>
-            <Typography fontWeight={"bold"}>Giới tính</Typography>
+            <Typography fontSize="14px">Giới tính</Typography>
             <Box
               sx={{
                 display: "flex",
@@ -604,31 +919,34 @@ function InfoEdit({ changeBody, handleCloseModal }) {
                 marginY: "10px",
               }}
             >
-              <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
                 <input
                   type="radio"
-                  id="nam"
-                  name="gt"
-                  value="Nam"
-                  checked={checked}
+                  id="male"
+                  name="gender"
+                  value="male"
+                  checked={gender}
                   onChange={handleChangeGender}
                 />
-                <label htmlFor="nam">Nam</label>
+                <label htmlFor="male">Nam</label>
               </div>
-              <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
                 <input
                   type="radio"
-                  id="nu"
-                  name="gt"
-                  value="Nữ"
+                  id="female"
+                  name="gender"
+                  value="female"
+                  checked={!gender}
                   onChange={handleChangeGender}
                 />
-                <label htmlFor="nu">Nữ</label>
+                <label htmlFor="female">Nữ</label>
               </div>
             </Box>
           </Box>
           <Box>
-            <Typography>Ngày sinh</Typography>
+            <Typography fontSize="14px" marginBottom="10px">
+              Ngày sinh
+            </Typography>
             <input
               type="date"
               style={{
@@ -653,167 +971,18 @@ function InfoEdit({ changeBody, handleCloseModal }) {
             marginRight: "10px",
           }}
         >
-          <button
-            style={{
-              backgroundColor: "#EAEDF0",
-              color: "#38485B",
-              fontSize: "1.2rem",
-              border: "none",
-              padding: "8px 16px",
-            }}
-            onClick={() => changeBody("default")}
-          >
+          <Button onClick={() => changeBody("default")} variant="outlined">
             Huỷ
-          </button>
-          <button
-            onClick={() => {
-              changeBody("default");
-            }}
-            style={{
-              backgroundColor: "#0068FF",
-              color: "white",
-              fontSize: "1.2rem",
-              border: "none",
-              padding: "8px 16px",
-            }}
-          >
+          </Button>
+          <Button onClick={handleChangeProfile} variant="contained">
             Cập nhật
-          </button>
+          </Button>
         </Box>
       </Box>
     </Box>
   );
 }
-function AnotherFunctions({ changeBody }) {
-  return (
-    <List>
-      <ListItemButton onClick={() => changeBody("group_chat")}>
-        <GroupOutlinedIcon sx={{ marginRight: 2 }} />
-        <Typography>Nhóm chung</Typography>
-      </ListItemButton>
-      <ListItemButton>
-        <BlockOutlinedIcon sx={{ marginRight: 2 }} />
-        <Typography>Chặn tin nhắn</Typography>
-      </ListItemButton>
-      <ListItemButton>
-        <DeleteOutlineOutlinedIcon sx={{ marginRight: 2 }} />
-        <Typography>Xoá bạn bè</Typography>
-      </ListItemButton>
-    </List>
-  );
-}
-function GroupChat({ changeBody, handleCloseModal }) {
-  return (
-    <Box sx={style}>
-      <HeaderModal
-        name="Nhóm chung"
-        changeBody={changeBody}
-        back="default"
-        handleCloseModal={handleCloseModal}
-      />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          paddingX: "10px",
-        }}
-      >
-        <Box
-          sx={{ position: "relative", display: "flex", alignItems: "center" }}
-        >
-          {/* Tìm kiếm nhóm theo tên */}
-          <SearchOutlinedIcon sx={{ position: "absolute", left: "10px" }} />
-          <input
-            type="text"
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "10px",
-              border: "none",
-              boxSizing: "border-box",
-              backgroundColor: "#EAEDF0",
-              paddingLeft: "40px",
-            }}
-            placeholder="Tìm nhóm theo tên"
-          />
-        </Box>
-        <div style={{ overflowY: "scroll", height: "430px" }}>
-          <List>
-            <ListItemButton>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "10px",
-                  msFlexDirection: "row",
-                  width: "100%",
-                }}
-              >
-                <AvatarGroup>
-                  <Avatar
-                    alt="Remy Sharp"
-                    src="https://mui.com/static/images/avatar/1.jpg"
-                  />
-                </AvatarGroup>
-                <Typography>Nhóm 1</Typography>
-              </Box>
-            </ListItemButton>
-            <ListItemButton>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "10px",
-                  msFlexDirection: "row",
-                  width: "100%",
-                }}
-              >
-                <AvatarGroup total={30} max={5} spacing="small">
-                  <AvatarGroup spacing="small">
-                    <Avatar
-                      alt="Remy Sharp"
-                      src="https://mui.com/static/images/avatar/1.jpg"
-                    />
-                    <Avatar
-                      alt="Travis Howard"
-                      src="https://mui.com/static/images/avatar/2.jpg"
-                    />
-                    <Avatar
-                      alt="Cindy Baker"
-                      src="https://mui.com/static/images/avatar/3.jpg"
-                    />
-                  </AvatarGroup>
-                </AvatarGroup>
-                <Typography>Nhóm 2</Typography>
-              </Box>
-            </ListItemButton>
-            <ListItemButton>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "10px",
-                  msFlexDirection: "row",
-                  width: "100%",
-                }}
-              >
-                <Avatar
-                  alt="Remy Sharp"
-                  src="https://mui.com/static/images/avatar/1.jpg"
-                />
-                <Typography>Nhóm 3</Typography>
-              </Box>
-            </ListItemButton>
-          </List>
-        </div>
-      </Box>
-    </Box>
-  );
-}
+
 function ButtonUpdate({ changeBody }) {
   return (
     <Button
@@ -832,74 +1001,3 @@ function ButtonUpdate({ changeBody }) {
     </Button>
   );
 }
-function Image() {
-  const [data, setData] = useState([]);
-
-  useLayoutEffect(() => {
-    const fetchData = async () => {
-      const result = await axios.get(
-        "https://65cdef30c715428e8b3f82d1.mockapi.io/person"
-      );
-      setData(result.data[0].picture);
-    };
-    fetchData();
-  }, []);
-
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [activeImage, setActiveImage] = useState(1);
-
-  const openModal = (index) => {
-    setActiveImage(index);
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
-
-  return (
-    <Box
-      marginX={2}
-      sx={{
-        maxHeight: "252px",
-      }}
-    >
-      <Typography fontWeight={"bold"}>Hình ảnh</Typography>
-      <ImageList cols={4} rowHeight={100}>
-        {data.map((src, index) => (
-          <ImageListItem key={index}>
-            <img src={src} alt="bla bla" onClick={() => openModal(index)} />
-          </ImageListItem>
-        ))}
-      </ImageList>
-      <Modal open={modalIsOpen} onClose={closeModal}>
-        <div
-          sx={{
-            maxWidth: "90%",
-            maxHeight: "90%",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          {data.map((src, index) => (
-            <img src={src} alt="bla bla" key={index} />
-          ))}
-        </div>
-      </Modal>
-    </Box>
-  );
-}
-
-// function ImageGallery({ images }) {
-//   return (
-//     <ImageList cols={4} rowHeight={100}>
-//       {images.map((image, index) => (
-//         <ImageListItem key={index}>
-//           <img src={image} alt="bla bla" />
-//         </ImageListItem>
-//       ))}
-//     </ImageList>
-//   );
-// }
