@@ -5,6 +5,16 @@ export const convertToDate = (dob) => {
   return formattedDate;
 };
 
+export const convertToDateTime = (date) => {
+  const formattedDate = moment(date).format("YYYY-MM-DD");
+  return formattedDate;
+};
+
+export const convertDateToDateObj = (date) => {
+  const dateObj = new Date(date);
+  return dateObj;
+};
+
 export const convertToTime = (date) => {
   const now = moment();
   const then = moment(date);
