@@ -13,11 +13,13 @@ import CardItemUser from "../components/CardItemUser";
 import CardItemGroup from "../components/CardItemGroup";
 import AddFriend from "../components/AddFriend";
 import CreateGroup from "../components/CreateGroup";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Chat from "../components/Chat";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
+import ConversationAPI from "../api/ConversationAPI";
+import { getAllConversations } from "../redux/conversationSlice";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -48,10 +50,23 @@ const Messager = () => {
   const [value, setValue] = useState(0);
   const { conversations } = useSelector((state) => state.conversation);
   const [conversation, setConversation] = useState(null);
+  const { accessToken } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await ConversationAPI.getAllConversationForUser(accessToken);
+      if (data) {
+        dispatch(getAllConversations(data));
+      }
+    };
+
+    fetchData();
+  }, [dispatch, accessToken]);
 
   return (
     <Grid container item xs={11.3}>
@@ -134,13 +149,11 @@ const Messager = () => {
           borderLeftColor: "rgba(0,0,0,0.3)",
           borderLeftStyle: "solid",
           height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          paddingRight: "20px",
         }}
       >
         {conversation ? (
-          <Chat conversation={conversation} />
+          <Chat conversation={conversation} setConversation={setConversation} />
         ) : (
           <Box>
             <Carousel

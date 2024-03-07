@@ -1,4 +1,3 @@
-import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -14,58 +13,61 @@ import {
   List,
   Avatar,
   Checkbox,
-  ListItemIcon,
-  ListItem,
   ListItemButton,
 } from "@mui/material";
 import { useState } from "react";
-import CardItemUser from "./CardItemUser";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import ConversationAPI from "../api/ConversationAPI";
+import { createConversation } from "../redux/conversationSlice";
+
 export default function CreateGroup() {
+  const { user, accessToken } = useSelector((state) => state.user);
+  const [name, setName] = useState("");
+  const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+
   const handleClickOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
-  const data = [
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/1.jpg",
-      name: "Lê Văn Tài",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/2.jpg",
-      name: "Đặng Thị Thơm",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/3.jpg",
-      name: "Nguyễn Văn A",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/4.jpg",
-      name: "Trần Thị B",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/5.jpg",
-      name: "Lê Văn Tài",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/6.jpg",
-      name: "Đặng Thị Thơm",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/7.jpg",
-      name: "Nguyễn Văn A",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/8.jpg",
-      name: "Trần Thị C",
-    },
-    {
-      avatarUrl: "https://mui.com/static/images/avatar/10.jpg",
-      name: "Đặng Thị CV",
-    },
-  ];
+
+  const addMember = (id) => {
+    setMembers([...members, id]);
+  };
+
+  const handleCreateGroup = async () => {
+    if (name.trim() === "") {
+      toast.warning("Tên nhóm không được để trống");
+      return;
+    }
+
+    if (members.length < 2) {
+      toast.warning("Bạn phải chọn ít nhất 2 thành viên");
+      return;
+    }
+
+    const conver = {
+      name,
+      admin: user.id,
+      members: [...members, user.id],
+      type: "GROUP",
+    };
+
+    const data = await ConversationAPI.createConversation(conver, accessToken);
+    if (data) {
+      dispatch(createConversation(data));
+      toast.success("Tạo nhóm thành công");
+      setName("");
+      setOpen(false);
+    } else {
+      toast.error("Tạo nhóm thất bại");
+    }
+  };
+
   return (
     <div>
       <Button
@@ -123,8 +125,6 @@ export default function CreateGroup() {
           <Box
             sx={{
               display: "flex",
-              // justifyContent: "center",
-              // alignItems: "center",
               gap: "0px",
               flexDirection: "column",
               padding: "16px",
@@ -142,16 +142,14 @@ export default function CreateGroup() {
               }}
             >
               <IconButton sx={{ marginTop: "15px", border: "1px solid" }}>
-                {/* <Avatar
-                    alt="Remy Sharp"
-                    src="https://mui.com/static/images/avatar/1.jpg"
-                /> */}
                 <CameraAltIcon />
               </IconButton>
               <TextField
                 id="oSutlined-basic"
                 label="Nhập tên nhóm"
                 variant="standard"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 sx={{ width: "100%" }}
               />
             </Box>
@@ -169,7 +167,6 @@ export default function CreateGroup() {
                   width: "100%",
                   marginBottom: "10px",
                   "& .MuiOutlinedInput-root": {
-                    // Add a colon after the selector
                     borderRadius: "25px",
                   },
                   "& .MuiInputBase-input": {
@@ -195,13 +192,19 @@ export default function CreateGroup() {
                   height: "85%",
                 }}
               >
-                <Typography fontWeight={700} paddingTop={1}>
-                  Trò chuyện gần đây
+                <Typography paddingTop={2} paddingBottom={1} fontStyle="italic">
+                  Danh sách bạn bè
                 </Typography>
                 <List>
-                  {data.map((item, index) => (
-                    <CardCheck key={index} url={item.avatarUrl} name={item.name} />
-                  ))}
+                  {user &&
+                    user.friendList.length > 0 &&
+                    user.friendList.map((friend) => (
+                      <CardCheck
+                        key={friend.id}
+                        friend={friend}
+                        addMember={addMember}
+                      />
+                    ))}
                 </List>
               </Box>
             </Box>
@@ -210,36 +213,17 @@ export default function CreateGroup() {
                 display: "flex",
                 justifyContent: "right",
                 alignItems: "center",
-                // marginTop: "30px",
                 gap: "10px",
                 paddingTop: "10px",
                 marginRight: "0",
               }}
             >
-              <button
-                style={{
-                  backgroundColor: "#EAEDF0",
-                  color: "#38485B",
-                  fontSize: "1.2rem",
-                  border: "none",
-                  padding: "8px 16px",
-                }}
-                onClick={handleClose}
-              >
+              <Button variant="outlined" onClick={handleClose}>
                 Huỷ
-              </button>
-              <button
-                onClick={() => {}}
-                style={{
-                  backgroundColor: "#0068FF",
-                  color: "white",
-                  fontSize: "1.2rem",
-                  border: "none",
-                  padding: "8px 16px",
-                }}
-              >
+              </Button>
+              <Button variant="contained" onClick={handleCreateGroup}>
                 Tạo nhóm
-              </button>
+              </Button>
             </Box>
           </Box>
         </Box>
@@ -247,26 +231,36 @@ export default function CreateGroup() {
     </div>
   );
 }
-function CardCheck({ url, name }) {
 
+function CardCheck({ friend, addMember }) {
   const [checked, setChecked] = useState(false);
 
   return (
-  <ListItemButton
-    sx={{
-      display: "flex",
-      paddingLeft: "5px",
-      paddingRight: "0px",
-    }}
-    onClick={() => setChecked(!checked)}
-  >
-    <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginRight: "10px" }}>
-      <Checkbox checked={checked} />
-      <Avatar alt={name} src={url} />
-    </Box>
-    <Box>
-      <Typography fontWeight="bold">{name}</Typography>
-    </Box>
-  </ListItemButton>
+    <ListItemButton
+      sx={{
+        display: "flex",
+        paddingLeft: "5px",
+        paddingRight: "0px",
+      }}
+      onClick={() => {
+        setChecked(!checked);
+        addMember(friend.id);
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          marginRight: "10px",
+        }}
+      >
+        <Checkbox checked={checked} />
+        <Avatar alt={friend.fullName} src={friend.avatarUrl} />
+      </Box>
+      <Box>
+        <Typography fontWeight="bold">{friend.fullName}</Typography>
+      </Box>
+    </ListItemButton>
   );
 }

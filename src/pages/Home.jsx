@@ -19,36 +19,24 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import Loading from "../components/Loading";
 import Profile from "../components/Profile";
 import { useDispatch, useSelector } from "react-redux";
-import ConversationAPI from "../api/ConversationAPI";
-import { getAllConversations } from "../redux/conversationSlice";
 import UserAPI from "../api/UserAPI";
 import { logout } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Messager = lazy(() => import("./Messager"));
 const Contact = lazy(() => import("./Contact"));
 
 const Home = () => {
   const { user } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { accessToken } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const [showMess, setShowMess] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await ConversationAPI.getAllConversationForUser(accessToken);
-      if (data) {
-        dispatch(getAllConversations(data));
-      }
-    };
-
-    fetchData();
-  }, [dispatch, accessToken]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -180,6 +168,7 @@ const Home = () => {
           {showMess ? <Messager /> : <Contact />}
         </Grid>
       </Box>
+      <ToastContainer />
     </Suspense>
   );
 };
