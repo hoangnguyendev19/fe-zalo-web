@@ -20,7 +20,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { useEffect, useState } from "react";
 import CreateGroup from "./CreateGroup";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import MessageSender from "./MessageSender";
 import MessageReceiver from "./MessageReceiver";
 import MessageAPI from "../api/MessageAPI";
@@ -30,8 +30,17 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import DehazeIcon from "@mui/icons-material/Dehaze";
 import UploadAPI from "../api/UploadAPI";
+import InforProfile from "./InforProfile";
+import ConversationAPI from "../api/ConversationAPI";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { deleteConversation, removeYourself } from "../redux/conversationSlice";
+import GroupsIcon from "@mui/icons-material/Groups";
+import AddMember from "./AddMember";
+import GroupMember from "./GroupMember";
+import { toast } from "react-toastify";
 
-const Chat = ({ conversation }) => {
+const Chat = ({ conversation, setConversation }) => {
   const { name, members, admin, type, id } = conversation;
   const { user, accessToken } = useSelector((state) => state.user);
   const [friend, setFriend] = useState({});
@@ -42,13 +51,72 @@ const Chat = ({ conversation }) => {
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [openInforProfile, setOpenInforProfile] = useState(false);
+  const [openAddMember, setOpenAddMember] = useState(false);
+  const [openGroupMember, setOpenGroupMember] = useState(false);
+  const dispatch = useDispatch();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
+  const handleDeleteConversation = async () => {
+    const data = await ConversationAPI.deleteConversation(
+      conversation.id,
+      accessToken
+    );
+    if (data) {
+      dispatch(deleteConversation(conversation.id));
+      setConversation(null);
+    }
+  };
+
+  const handleFriendItemClick = async (index) => {
+    if (index === 0) {
+      setOpenInforProfile(true);
+    }
+    if (index === 2) {
+      handleDeleteConversation();
+      toast.success("Bạn đã xoá cuộc trò chuyện thành công!");
+    }
+  };
+
+  const handleGroupItemClick = async (index) => {
+    if (index === 0) {
+      setOpenAddMember(true);
+    }
+    if (index === 2) {
+      setOpenGroupMember(true);
+    }
+
+    if (index === 3) {
+      if (conversation.admin === user.id) {
+        toast.warning(
+          "Trước khi rời khỏi, bạn cần trao quyền trưởng nhóm cho người khác!"
+        );
+        return;
+      }
+
+      if (conversation.members.length === 3) {
+        handleDeleteConversation();
+        toast.success("Bạn đã rời khỏi nhóm thành công!");
+        return;
+      }
+
+      const data = await ConversationAPI.removeYourselfForConversation(
+        conversation.id,
+        accessToken
+      );
+      if (data) {
+        dispatch(removeYourself(conversation.id));
+        setConversation(null);
+        toast.success("Bạn đã rời khỏi nhóm thành công!");
+      }
+    }
+  };
+
   const DrawerList = (
-    <Box sx={{ width: 400 }} role="presentation" onClick={toggleDrawer(false)}>
+    <Box sx={{ width: 400 }} role="presentation">
       <Typography
         textAlign="center"
         fontWeight="bold"
@@ -67,41 +135,125 @@ const Chat = ({ conversation }) => {
           padding: "20px 0",
         }}
       >
-        {friend?.avatarUrl ? (
-          <Avatar
-            src={friend.avatarUrl}
-            alt="avatar"
-            sx={{ width: 60, height: 60 }}
-          />
+        {conversation.type === "FRIEND" ? (
+          <>
+            <Avatar
+              src={friend.avatarUrl}
+              alt="avatar"
+              sx={{ width: 60, height: 60 }}
+            />
+            <Typography
+              textAlign="center"
+              paddingTop="10px"
+              fontWeight="bold"
+              fontSize="18px"
+            >
+              {friend.fullName}
+            </Typography>
+          </>
         ) : (
-          <Avatar sx={{ width: 60, height: 60 }}>{friend.fullName}</Avatar>
+          <>
+            <AvatarGroup max={2}>
+              {members?.length > 0 &&
+                members?.map((mem) => (
+                  <Avatar key={mem.id} alt={mem.fullName} src={mem.avatarUrl} />
+                ))}
+            </AvatarGroup>
+            <Typography
+              textAlign="center"
+              paddingTop="10px"
+              fontWeight="bold"
+              fontSize="18px"
+            >
+              {name}
+            </Typography>
+          </>
         )}
-        <Typography
-          textAlign="center"
-          paddingTop="10px"
-          fontWeight="bold"
-          fontSize="18px"
-        >
-          {friend.fullName}
-        </Typography>
       </Box>
       <Divider />
-      <List>
-        {["Thông tin cá nhân", "Tắt thông báo", "Xoá cuộc trò chuyện"].map(
-          (text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton sx={{ color: index === 2 ? "red" : "inherit" }}>
+      {conversation.type === "FRIEND" && (
+        <List>
+          {["Thông tin cá nhân", "Tắt thông báo", "Xoá cuộc trò chuyện"].map(
+            (text, index) => (
+              <ListItem
+                key={text}
+                disablePadding
+                onClick={() => handleFriendItemClick(index)}
+              >
+                <ListItemButton sx={{ color: index === 2 ? "red" : "inherit" }}>
+                  <ListItemIcon>
+                    {index === 0 && <AccountCircleIcon />}
+                    {index === 1 && <NotificationsOffIcon />}
+                    {index === 2 && <DeleteIcon color="error" />}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
+        </List>
+      )}
+      <InforProfile
+        openModal={openInforProfile}
+        setOpenModal={setOpenInforProfile}
+        friend={friend}
+      />
+      {conversation.type === "GROUP" && (
+        <List>
+          {[
+            "Thêm thành viên",
+            "Tắt thông báo",
+            "Xem danh sách thành viên",
+            "Rời khỏi nhóm",
+          ].map((text, index) => (
+            <ListItem
+              key={text}
+              disablePadding
+              onClick={() => handleGroupItemClick(index)}
+            >
+              <ListItemButton
+                sx={{ color: index === 3 || index === 4 ? "red" : "inherit" }}
+              >
                 <ListItemIcon>
-                  {index === 0 && <AccountCircleIcon />}
+                  {index === 0 && <PersonAddIcon />}
                   {index === 1 && <NotificationsOffIcon />}
-                  {index === 2 && <DeleteIcon color="error" />}
+                  {index === 2 && <GroupsIcon />}
+                  {index === 3 && <ExitToAppIcon color="error" />}
                 </ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText
+                  primary={index === 2 ? `${text}(${members.length})` : text}
+                />
               </ListItemButton>
             </ListItem>
-          )
-        )}
-      </List>
+          ))}
+          {conversation.admin === user.id && (
+            <ListItem
+              key={"Xoá cuộc trò chuyện"}
+              disablePadding
+              onClick={handleDeleteConversation}
+            >
+              <ListItemButton sx={{ color: "red" }}>
+                <ListItemIcon>
+                  <DeleteIcon color="error" />
+                </ListItemIcon>
+                <ListItemText primary={"Xoá cuộc trò chuyện"} />
+              </ListItemButton>
+            </ListItem>
+          )}
+        </List>
+      )}
+      <AddMember
+        openModal={openAddMember}
+        setOpenModal={setOpenAddMember}
+        conversation={conversation}
+        setConversation={setConversation}
+      />
+      <GroupMember
+        openModal={openGroupMember}
+        setOpenModal={setOpenGroupMember}
+        conversation={conversation}
+        setConversation={setConversation}
+      />
     </Box>
   );
 

@@ -29,6 +29,18 @@ const getConversationById = async (conversationId, token) => {
   }
 };
 
+const getConversationByUserAndMe = async (userId, token) => {
+  try {
+    const { data } = await axiosInstance.get(`/same?userId=${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const createConversation = async (conversation, token) => {
   try {
     const { data } = await axiosInstance.post("/", conversation, {
@@ -120,6 +132,7 @@ const deleteConversation = async (conversationId, token) => {
 const ConversationAPI = {
   getAllConversationForUser,
   getConversationById,
+  getConversationByUserAndMe,
   createConversation,
   removeUserForConversation,
   addUserForConversation,
