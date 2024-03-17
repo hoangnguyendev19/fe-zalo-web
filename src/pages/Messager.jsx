@@ -155,7 +155,7 @@ const Messager = () => {
         {conversation ? (
           <Chat conversation={conversation} setConversation={setConversation} />
         ) : (
-          <Box>
+          <Box sx={{ marginTop: "100px" }}>
             <Carousel
               showThumbs={false}
               showStatus={false}
