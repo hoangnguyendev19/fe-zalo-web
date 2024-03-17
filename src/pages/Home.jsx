@@ -24,6 +24,7 @@ import { logout } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ChangePassword from "../components/ChangePassword";
 
 const Messager = lazy(() => import("./Messager"));
 const Contact = lazy(() => import("./Contact"));
@@ -141,12 +142,7 @@ const Home = () => {
                         <Profile />
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
-                        <ListItemButton>
-                          <Box sx={{ marginRight: "10px" }}>
-                            <SettingsIcon />
-                          </Box>
-                          <Typography>Cài đặt</Typography>
-                        </ListItemButton>
+                        <ChangePassword />
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
                         <ListItemButton onClick={handleLogout}>
