@@ -4,6 +4,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { convertToTime } from "../utils";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import DescriptionIcon from "@mui/icons-material/Description";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const MessageSender = ({ message, handleRevokeMessage }) => {
   const { content, type, isRevoked, createdAt, likes, id } = message;
@@ -47,31 +49,83 @@ const MessageSender = ({ message, handleRevokeMessage }) => {
         ) : (
           <>
             {type === "TEXT" && (
-              <>
-                <Typography
-                  color={"black"}
-                  fontWeight={"bold"}
-                  marginBottom="10px"
-                >
-                  {content}
-                </Typography>
-              </>
+              <Typography
+                color={"black"}
+                fontWeight={"bold"}
+                marginBottom="10px"
+              >
+                {content}
+              </Typography>
             )}
             {type === "IMAGE" && (
-              <Button onClick={() => setOpening(true)}>
-                <img
-                  src={content}
-                  alt="image"
-                  style={{ width: "400px", height: "300px" }}
-                />
-              </Button>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <Button
+                  onClick={() => setOpening(true)}
+                  style={{ marginBottom: "10px" }}
+                >
+                  <img
+                    src={content}
+                    alt="image"
+                    style={{ width: "400px", height: "300px" }}
+                  />
+                </Button>
+                <Button href={content} download>
+                  <FileDownloadIcon fontSize="small" />
+                  <Typography fontSize={14}>TẢI XUỐNG</Typography>
+                </Button>
+              </Box>
             )}
             {type === "VIDEO" && (
-              <>
+              <Box
+                sx={{
+                  marginBottom: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+              >
                 <video width="600" height="400" controls>
                   <source src={content} type="video/mp4" />
                 </video>
-              </>
+                <Button href={content} download style={{ marginTop: "10px" }}>
+                  <FileDownloadIcon fontSize="small" />
+                  <Typography fontSize={14}>TẢI XUỐNG</Typography>
+                </Button>
+              </Box>
+            )}
+            {type === "FILE" && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <DescriptionIcon fontSize="large" />
+                <Box marginLeft="10px">
+                  <Typography fontSize={14} fontWeight="bold">
+                    {content.split("/").pop()}
+                  </Typography>
+                  <Button
+                    href={content}
+                    download
+                    style={{
+                      marginTop: "5px",
+                    }}
+                  >
+                    <FileDownloadIcon fontSize="small" />
+                    <Typography fontSize={14}>
+                      Tải xuống tệp đính kèm
+                    </Typography>
+                  </Button>
+                </Box>
+              </Box>
             )}
             <Typography fontSize={14}>{convertToTime(createdAt)}</Typography>
           </>

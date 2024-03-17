@@ -233,15 +233,25 @@ function AvatarHome({ fullName, avatarUrl, coverImage, changeBody }) {
           style={{ width: "100%" }}
         >
           <Box sx={{ width: "100%" }}>
-            <img
-              src={coverImage}
-              alt="load"
-              style={{
-                width: "100%",
-                height: "180px",
-                objectFit: "cover",
-              }}
-            />
+            {coverImage ? (
+              <img
+                src={coverImage}
+                alt="load"
+                style={{
+                  width: "100%",
+                  height: "180px",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "180px",
+                  backgroundColor: "#C0C0C0",
+                }}
+              ></Box>
+            )}
           </Box>
         </Badge>
       </Box>
@@ -644,14 +654,16 @@ function ImageUploader({ changeBody, handleCloseModal }) {
                 marginTop: "60px",
               }}
             >
-              <img
-                src={user?.coverImage ? user.coverImage : ""}
-                alt="image"
-                style={{
-                  width: 360,
-                  height: 320,
-                }}
-              />
+              {user?.coverImage && (
+                <img
+                  src={user?.coverImage ? user.coverImage : ""}
+                  alt="image"
+                  style={{
+                    width: 360,
+                    height: 320,
+                  }}
+                />
+              )}
             </Box>
           </Box>
         </Box>

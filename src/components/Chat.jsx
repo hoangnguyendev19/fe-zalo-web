@@ -98,6 +98,7 @@ const Chat = ({ conversation, setConversation }) => {
       }
 
       if (conversation.members.length === 3) {
+        console.log("remove");
         handleDeleteConversation();
         toast.success("Bạn đã rời khỏi nhóm thành công!");
         return;
@@ -398,12 +399,33 @@ const Chat = ({ conversation, setConversation }) => {
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append("file", file);
-    const imageUrl = await UploadAPI.uploadFile(formData);
+    const data = await UploadAPI.uploadFile(formData);
 
-    if (imageUrl) {
+    if (data) {
       const message = {
-        content: imageUrl,
-        type: "IMAGE",
+        content: data,
+        type: data.includes("video") ? "VIDEO" : "IMAGE",
+        conversationId: conversation.id,
+        senderId: user.id,
+      };
+      if (socket) {
+        socket.emit("send_message", message);
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleSendFile = async (event) => {
+    setLoading(true);
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    const data = await UploadAPI.uploadFile(formData);
+
+    if (data) {
+      const message = {
+        content: data,
+        type: "FILE",
         conversationId: conversation.id,
         senderId: user.id,
       };
@@ -496,20 +518,29 @@ const Chat = ({ conversation, setConversation }) => {
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", padding: "5px 0" }}>
           <Box sx={{ padding: "0px 20px" }}>
-            <label htmlFor="upload">
+            <label htmlFor="uploadImg">
               <ImageIcon />
             </label>
             <input
-              id="upload"
+              id="uploadImg"
               type="file"
-              accept="image/*"
+              accept=".png, .jpg, .jpeg, .gif, .mp4, .avi"
               style={{ display: "none", padding: "10px" }}
               onChange={handleSendImage}
             />
           </Box>
-          <Button sx={{ color: "#000" }}>
-            <AttachFileIcon />
-          </Button>
+          <Box sx={{ padding: "0px 20px" }}>
+            <label htmlFor="uploadFile">
+              <AttachFileIcon />
+            </label>
+            <input
+              id="uploadFile"
+              type="file"
+              accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .zip, .rar"
+              style={{ display: "none", padding: "10px" }}
+              onChange={handleSendFile}
+            />
+          </Box>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <TextField

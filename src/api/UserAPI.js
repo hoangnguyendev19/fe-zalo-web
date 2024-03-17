@@ -66,6 +66,18 @@ const updatePassword = async (password, newPassword, token) => {
   }
 };
 
+const forgotPassword = async (email) => {
+  try {
+    const { data } = await axiosInstance.post("/forgot-password", {
+      email,
+    });
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const getUserById = async (userId) => {
   try {
     const { data } = await axiosInstance.get(`/${userId}`);
@@ -185,6 +197,7 @@ const UserAPI = {
   login,
   logout,
   updatePassword,
+  forgotPassword,
   getUserById,
   getUserByPhoneNumber,
   getMe,
