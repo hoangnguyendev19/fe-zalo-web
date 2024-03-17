@@ -4,120 +4,75 @@ import {
   InputAdornment,
   TextField,
   Button,
-  List,
-  Avatar,
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import DraftsOutlinedIcon from "@mui/icons-material/DraftsOutlined";
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState } from "react";
 import ListFriend from "../components/ListFriend";
 import ListGroup from "../components/ListGroup";
 import RequestFriend from "../components/RequestFriend";
-
 import AddFriend from "../components/AddFriend";
 import CreateGroup from "../components/CreateGroup";
-import axios from "axios";
-import { DatasetLinkedTwoTone } from "@mui/icons-material";
-
-const listUser = [
-  {
-    id: 1,
-    fullName: "Nguyen Huy Hoang",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 2,
-    fullName: "Do Chi Tuong",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 3,
-    fullName: "Truong Duong Minh Nhat",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 4,
-    fullName: "Nguyen Ho Dang Quang",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-];
-
-function CustomTabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <List sx={{ maxHeight: "560px", overflow: "auto" }}>{children}</List>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
+import Chat from "../components/Chat";
+import { useDispatch, useSelector } from "react-redux";
+import ConversationAPI from "../api/ConversationAPI";
+import { createConversation } from "../redux/conversationSlice";
 
 const Contact = () => {
   const [show, setShow] = useState("ListFriend");
-  const [value, setValue] = useState(0);
-  const [listFriends, setListFriends] = useState([]);
-  const [listGroups, setListGroups] = useState([]);
-  const [listRequestFriends, setListRequestFriends] = useState([]);
-  const [listReceiveRequestFriends, setListReceiveRequestFriends] = useState([]);
-  const [listFriendsExample, setListFriendsExample] = useState([]);
+  const [conversation, setConversation] = useState(null);
+  const { conversations } = useSelector((state) => state.conversation);
+  const { user, accessToken } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
-  useLayoutEffect(() => {
-    async function fetchDataListFriends() {
-      const response = await axios.get('http://localhost:8080/api/person/get-all')
-      setListFriends(response.data)
+  const handleOpenFriendChat = async (id) => {
+    const conv = conversations.find((conver) => {
+      if (
+        conver.type === "FRIEND" &&
+        conver.members.find((mem) => mem.id === id)
+      ) {
+        return conver;
+      }
+    });
+    if (conv) {
+      setConversation(conv);
+    } else {
+      const newConver = {
+        type: "FRIEND",
+        members: [user.id, id],
+        admin: user.id,
+      };
+      const data = await ConversationAPI.createConversation(
+        newConver,
+        accessToken
+      );
+      if (data) {
+        dispatch(createConversation(data));
+        setConversation(data);
+      }
     }
+    setShow("Chat");
+  };
 
-    async function fetchDataListGroups() {
-      const response = await axios.get('http://localhost:8080/api/group-message/get-info-group-and-person-join')
-      setListGroups(response.data)
-    }
-
-    async function fetchDataListRequestFriends() { 
-      const reponseRequestFriends = await axios.get('http://localhost:8080/api/friends/get-send-request-friends/7')
-      setListRequestFriends(reponseRequestFriends.data)
-      const reponseReceiveRequestFriends = await axios.get('http://localhost:8080/api/friends/get-receive-request-friends/2')
-      setListReceiveRequestFriends(reponseReceiveRequestFriends.data)
-      const reponseFriendsExample = await axios.get('http://localhost:8080/api/person/get-all-persons-except-one-person/1')
-      setListFriendsExample(reponseFriendsExample.data)
-    }
-
-    fetchDataListFriends()
-    fetchDataListGroups()
-    fetchDataListRequestFriends()
-  }, [])
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const handleOpenGroupChat = (conver) => {
+    setConversation(conver);
+    setShow("Chat");
   };
 
   return (
-    <>
+    <Grid container item xs={11.3}>
       <Grid item xs={3}>
-        <Box sx={{ display: "flex", alignItems: "center", marginTop: "20px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: "20px",
+            marginRight: "10px",
+          }}
+        >
           <TextField
             placeholder="Tìm kiếm"
             InputProps={{
@@ -126,7 +81,7 @@ const Contact = () => {
                   <SearchIcon />
                 </InputAdornment>
               ),
-            }} 
+            }}
             variant="outlined"
             size="small"
             fullWidth
@@ -192,13 +147,31 @@ const Contact = () => {
           </Button>
         </Box>
       </Grid>
-      <Grid item xs={8.3}>
-        {show === "ListFriend" && <ListFriend listFriends={listFriends} />}
-        {show === "ListGroup" && <ListGroup listGroups={listGroups} />}
-        {show === "RequestFriend" && <RequestFriend listRequestFriends={listRequestFriends}
-          listReceiveRequestFriend={listReceiveRequestFriends} listFriendsExample={listFriendsExample} />}
+      <Grid
+        item
+        xs={8.7}
+        sx={{
+          borderLeftWidth: 1,
+          borderLeftColor: "rgba(0,0,0,0.3)",
+          borderLeftStyle: "solid",
+          height: "100%",
+          paddingRight: "20px",
+        }}
+      >
+        {show === "ListFriend" && (
+          <ListFriend handleOpenChat={handleOpenFriendChat} />
+        )}
+        {show === "ListGroup" && (
+          <ListGroup handleOpenChat={handleOpenGroupChat} />
+        )}
+        {show === "RequestFriend" && (
+          <RequestFriend handleOpenChat={handleOpenFriendChat} />
+        )}
+        {show === "Chat" && (
+          <Chat conversation={conversation} setConversation={setConversation} />
+        )}
       </Grid>
-    </>
+    </Grid>
   );
 };
 

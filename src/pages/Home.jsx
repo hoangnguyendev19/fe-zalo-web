@@ -10,27 +10,33 @@ import {
   ListItemIcon,
   Popover,
   Typography,
-  Modal,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import SettingsIcon from "@mui/icons-material/Settings";
-
-import { useState, lazy, Suspense } from "react";
-
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { useState, lazy, Suspense, useEffect } from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Loading from "../components/Loading";
-
-import Profile  from "./Profile";
+import Profile from "../components/Profile";
+import { useDispatch, useSelector } from "react-redux";
+import UserAPI from "../api/UserAPI";
+import { logout } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Messager = lazy(() => import("./Messager"));
 const Contact = lazy(() => import("./Contact"));
 
 const Home = () => {
-  const [showMess, setShowMess] = useState(true);
+  const { user } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const [showMess, setShowMess] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -40,8 +46,12 @@ const Home = () => {
     setAnchorEl(null);
   };
 
-  const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
+  const handleLogout = async () => {
+    await UserAPI.logout();
+    dispatch(logout());
+    navigate("/");
+  };
+
   return (
     <Suspense fallback={<Loading />}>
       <Box sx={{ width: "100vw", height: "100vh" }}>
@@ -68,7 +78,7 @@ const Home = () => {
                     <Avatar
                       sx={{ margin: "0 auto" }}
                       alt="avatar"
-                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                      src={user?.avatarUrl}
                     />
                   </Box>
                 </ListItemAvatar>
@@ -127,8 +137,8 @@ const Home = () => {
                     }}
                   >
                     <List>
-                      <ListItem sx={{ padding: "0px" }}  >
-                        <Profile/>
+                      <ListItem sx={{ padding: "0px" }}>
+                        <Profile />
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
                         <ListItemButton>
@@ -139,7 +149,7 @@ const Home = () => {
                         </ListItemButton>
                       </ListItem>
                       <ListItem sx={{ padding: "0px" }}>
-                        <ListItemButton>
+                        <ListItemButton onClick={handleLogout}>
                           <Box sx={{ marginRight: "10px" }}>
                             <LogoutIcon />
                           </Box>
@@ -148,7 +158,7 @@ const Home = () => {
                       </ListItem>
                     </List>
                   </Popover>
-                      <ListItemButton aria-describedby={id} onClick={handleClick}>
+                  <ListItemButton aria-describedby={id} onClick={handleClick}>
                     <SettingsIcon sx={{ color: "#fff" }} />
                   </ListItemButton>
                 </ListItemIcon>
@@ -158,6 +168,7 @@ const Home = () => {
           {showMess ? <Messager /> : <Contact />}
         </Grid>
       </Box>
+      <ToastContainer />
     </Suspense>
   );
 };
