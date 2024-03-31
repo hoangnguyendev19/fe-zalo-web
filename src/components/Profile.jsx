@@ -388,12 +388,13 @@ function AvatarUploader({ changeBody, handleCloseModal }) {
   const handleUpdateAvatar = async () => {
     setLoading(true);
     const formData = new FormData();
-    formData.append("file", fileImg);
+    formData.append("image", fileImg);
     const avatarUrl = await UploadAPI.uploadImage(formData);
     if (avatarUrl) {
       const newUser = {
         fullName: user.fullName,
         gender: user?.gender,
+        email: user?.email,
         dateOfBirth: user?.dateOfBirth,
         avatarUrl,
         coverImage: user?.coverImage,
@@ -596,17 +597,22 @@ function ImageUploader({ changeBody, handleCloseModal }) {
   const handleUpdateImage = async () => {
     setLoading(true);
     const formData = new FormData();
-    formData.append("file", fileImg);
+    formData.append("image", fileImg);
+
     const imageUrl = await UploadAPI.uploadImage(formData);
+
     if (imageUrl) {
       const newUser = {
-        fullName: user.fullName,
+        fullName: user?.fullName,
         gender: user?.gender,
+        email: user?.email,
         dateOfBirth: user?.dateOfBirth,
         avatarUrl: user?.avatarUrl,
         coverImage: imageUrl,
       };
+
       const data = await UserAPI.updateMe(newUser);
+      console.log(data);
       if (data) {
         dispatch(setUser(data));
         setLoading(false);
