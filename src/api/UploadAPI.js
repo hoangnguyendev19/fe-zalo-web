@@ -1,13 +1,8 @@
-import axios from "axios";
+import { axiosFormData } from '../utils/axiosConfig';
 
-const axiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_REACT_APP_API_URL}/uploads`,
-  headers: { "Content-Type": "multipart/form-data" },
-});
-
-const uploadFile = async (file) => {
+const uploadImage = async (file) => {
   try {
-    const { data } = await axiosInstance.post("/upload-file", file);
+    const { data } = await axiosFormData.post('/api/v1/uploads/image', file);
 
     return data.data;
   } catch (error) {
@@ -15,6 +10,16 @@ const uploadFile = async (file) => {
   }
 };
 
-const UploadAPI = { uploadFile };
+const uploadFile = async (file) => {
+  try {
+    const { data } = await axiosFormData.post('/api/v1/uploads/file', file);
+
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const UploadAPI = { uploadFile, uploadImage };
 
 export default UploadAPI;

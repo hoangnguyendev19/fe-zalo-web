@@ -42,7 +42,7 @@ import { toast } from "react-toastify";
 
 const Chat = ({ conversation, setConversation }) => {
   const { name, members, admin, type, id } = conversation;
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const [friend, setFriend] = useState({});
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
@@ -61,10 +61,7 @@ const Chat = ({ conversation, setConversation }) => {
   };
 
   const handleDeleteConversation = async () => {
-    const data = await ConversationAPI.deleteConversation(
-      conversation.id,
-      accessToken
-    );
+    const data = await ConversationAPI.deleteConversation(conversation.id);
     if (data) {
       dispatch(deleteConversation(conversation.id));
       setConversation(null);
@@ -105,8 +102,7 @@ const Chat = ({ conversation, setConversation }) => {
       }
 
       const data = await ConversationAPI.removeYourselfForConversation(
-        conversation.id,
-        accessToken
+        conversation.id
       );
       if (data) {
         dispatch(removeYourself(conversation.id));
@@ -227,7 +223,7 @@ const Chat = ({ conversation, setConversation }) => {
               </ListItemButton>
             </ListItem>
           ))}
-          {conversation.admin === user.id && (
+          {conversation.admin === user?.id && (
             <ListItem
               key={"Xoá cuộc trò chuyện"}
               disablePadding
@@ -262,8 +258,7 @@ const Chat = ({ conversation, setConversation }) => {
     const fetchData = async () => {
       try {
         const data = await MessageAPI.getAllMessageForConversation(
-          conversation?.id,
-          accessToken
+          conversation?.id
         );
         setMessages(data);
       } catch (error) {
@@ -398,8 +393,8 @@ const Chat = ({ conversation, setConversation }) => {
     setLoading(true);
     const file = event.target.files[0];
     const formData = new FormData();
-    formData.append("file", file);
-    const data = await UploadAPI.uploadFile(formData);
+    formData.append("image", file);
+    const data = await UploadAPI.uploadImage(formData);
 
     if (data) {
       const message = {
@@ -494,7 +489,7 @@ const Chat = ({ conversation, setConversation }) => {
           {messages &&
             messages.length > 0 &&
             messages.map((msg) => {
-              if (msg.senderId.id === user.id) {
+              if (msg.senderId.id === user?.id) {
                 return (
                   <MessageSender
                     key={msg.id}
@@ -536,7 +531,7 @@ const Chat = ({ conversation, setConversation }) => {
             <input
               id="uploadFile"
               type="file"
-              accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .zip, .rar"
+              accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .zip, .rar, .csv"
               style={{ display: "none", padding: "10px" }}
               onChange={handleSendFile}
             />

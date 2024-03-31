@@ -1,6 +1,15 @@
-import { Box, Container, Typography, Tabs, Tab } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Tabs,
+  Tab,
+  Modal,
+  TextField,
+  Button,
+} from "@mui/material";
 import { io } from "socket.io-client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserAPI from "../api/UserAPI";
 import { ToastContainer, toast } from "react-toastify";
@@ -9,6 +18,21 @@ import { useDispatch } from "react-redux";
 import { login, signup } from "../redux/userSlice";
 import Signup from "../components/Signup";
 import Login from "../components/Login";
+import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import TokenAPI from "../api/TokenAPI";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  borderRadius: 8,
+  p: 4,
+};
 
 const CustomTabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -41,6 +65,20 @@ const Start = () => {
   const [value, setValue] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [user, setUser] = useState({});
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const [otp, setOtp] = useState("");
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    if (TokenAPI.getAccessToken() && TokenAPI.getRefreshToken()) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -78,7 +116,13 @@ const Start = () => {
     }
   };
 
-  const handleSignup = async (fullName, phoneNumber, password, rePassword) => {
+  const handleSignup = async (
+    fullName,
+    email,
+    phoneNumber,
+    password,
+    rePassword
+  ) => {
     if (fullName.trim() === "") {
       toast.error("Bạn chưa nhập họ và tên!");
       return;
@@ -91,6 +135,16 @@ const Start = () => {
 
     if (phoneNumber.length !== 10) {
       toast.error("Số điện thoại phải có 10 số!");
+      return;
+    }
+
+    if (email.trim() === "") {
+      toast.error("Bạn chưa nhập email!");
+      return;
+    }
+
+    if (!email.includes("@gmail.com")) {
+      toast.error("Email không hợp lệ!");
       return;
     }
 
@@ -109,15 +163,61 @@ const Start = () => {
       return;
     }
 
-    const data = await UserAPI.signup(fullName, phoneNumber, password);
+    const data = await UserAPI.signup(email, phoneNumber);
+    console.log(data);
     if (data) {
+      setUser({ ...user, fullName, email, phoneNumber, password });
+      handleOpen();
+    } else {
+      toast.error("Số điện thoại hoặc email đã tồn tại!");
+    }
+  };
+
+  const handleSendOtp = async () => {
+    if (user.email === "" || user.phoneNumber === "") {
+      toast.error("Có lỗi xảy ra!");
+      return;
+    }
+
+    const data = await UserAPI.signup(user?.email, user?.phoneNumber);
+    if (data) {
+      setKey((prevKey) => prevKey + 1);
+      toast.success(
+        "Gửi lại mã OTP thành công! Vui lòng kiểm tra email của bạn!"
+      );
+    } else {
+      toast.error("Gửi mã OTP thất bại!");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (
+      user.fullName === "" ||
+      user.email === "" ||
+      user.phoneNumber === "" ||
+      user.password === "" ||
+      otp === ""
+    ) {
+      toast.error("Có lỗi xảy ra!");
+      return;
+    }
+
+    const data = await UserAPI.verifyOtp(
+      user.fullName,
+      user.email,
+      user.phoneNumber,
+      user.password,
+      otp
+    );
+
+    if (data) {
+      handleClose();
       const socket = io(`${import.meta.env.EXPO_PUBLIC_SOCKET_URL}`);
       socket.emit("login", data.user.id);
       dispatch(signup(data));
-
       navigate("/home");
     } else {
-      toast.error("Số điện thoại đã tồn tại!");
+      toast.error("Mã OTP không đúng!");
     }
   };
 
@@ -165,6 +265,77 @@ const Start = () => {
           </CustomTabPanel>
         </Box>
       </Box>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Xác thực OTP
+          </Typography>
+          <TextField
+            id="otp"
+            label="Mã OTP"
+            variant="standard"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            fullWidth
+            style={{ marginTop: "20px" }}
+          />
+          <Box
+            sx={{
+              margin: "20px 0",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            <CountdownCircleTimer
+              key={key}
+              isPlaying
+              duration={30}
+              colors={["#004777", "#F7B801", "#A30000", "red"]}
+              colorsTime={[20, 10, 5, 0]}
+              strokeWidth={5}
+              size={80}
+              st
+            >
+              {({ remainingTime }) => remainingTime}
+            </CountdownCircleTimer>
+            <Typography color="red" sx={{ marginTop: "10px" }}>
+              Thời gian hiệu lực
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            fullWidth
+            style={{ margin: "20px 0" }}
+            onClick={handleVerifyOtp}
+          >
+            Xác nhận
+          </Button>
+          <Button
+            variant="contained"
+            color="inherit"
+            fullWidth
+            onClick={handleSendOtp}
+          >
+            Gửi lại mã OTP
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            fullWidth
+            style={{ marginTop: "20px" }}
+            onClick={handleClose}
+          >
+            Huỷ bỏ
+          </Button>
+        </Box>
+      </Modal>
       <ToastContainer />
     </Container>
   );

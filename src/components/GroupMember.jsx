@@ -40,14 +40,13 @@ export default function GroupMember({
   setConversation,
 }) {
   const handleCloseModal = () => setOpenModal(false);
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleAssignAdmin = async (id) => {
     const data = await ConversationAPI.assignAdminForConversation(
       id,
-      conversation.id,
-      accessToken
+      conversation.id
     );
     if (data) {
       dispatch(assignAdmin({ conversationId: conversation.id, userId: id }));
@@ -65,8 +64,7 @@ export default function GroupMember({
 
     const data = await ConversationAPI.removeUserForConversation(
       id,
-      conversation.id,
-      accessToken
+      conversation.id
     );
     if (data) {
       dispatch(removeUser({ conversationId: conversation.id, userId: id }));
@@ -106,12 +104,13 @@ export default function GroupMember({
           </IconButton>
         </Box>
         <Divider />
-        <Box sx={{}}>
+        <Box>
           {conversation &&
             conversation?.members?.map((member) => {
               if (member.id === conversation.admin) {
                 return (
                   <Box
+                    key={member.id}
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -139,6 +138,7 @@ export default function GroupMember({
               } else {
                 return (
                   <Box
+                    key={member.id}
                     sx={{
                       display: "flex",
                       alignItems: "center",

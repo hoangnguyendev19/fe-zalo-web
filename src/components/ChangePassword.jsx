@@ -35,7 +35,6 @@ const style = {
 
 export default function ChangePassword() {
   const [openModal, setOpenModal] = useState(false);
-  const { accessToken } = useSelector((state) => state.user);
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -60,11 +59,7 @@ export default function ChangePassword() {
       return;
     }
 
-    const data = await UserAPI.updatePassword(
-      password,
-      newPassword,
-      accessToken
-    );
+    const data = await UserAPI.updatePassword(password, newPassword);
 
     if (data) {
       toast.success("Cập nhật mật khẩu thành công");

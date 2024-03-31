@@ -1,15 +1,8 @@
-import axios from "axios";
+import { axiosAuth } from "../utils/axiosConfig";
 
-const axiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_REACT_APP_API_URL}/conversations`,
-  headers: { "Content-Type": "application/json" },
-});
-
-const getAllConversationForUser = async (token) => {
+const getAllConversationForUser = async () => {
   try {
-    const { data } = await axiosInstance.get("", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const { data } = await axiosAuth.get("/api/v1/conversations");
 
     return data.data;
   } catch (error) {
@@ -17,11 +10,11 @@ const getAllConversationForUser = async (token) => {
   }
 };
 
-const getConversationById = async (conversationId, token) => {
+const getConversationById = async (conversationId) => {
   try {
-    const { data } = await axiosInstance.get(`/${conversationId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const { data } = await axiosAuth.get(
+      `/api/v1/conversations/${conversationId}`
+    );
 
     return data.data;
   } catch (error) {
@@ -29,11 +22,11 @@ const getConversationById = async (conversationId, token) => {
   }
 };
 
-const getConversationByUserAndMe = async (userId, token) => {
+const getConversationByUserAndMe = async (userId) => {
   try {
-    const { data } = await axiosInstance.get(`/same?userId=${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const { data } = await axiosAuth.get(
+      `/api/v1/conversations/same?userId=${userId}`
+    );
 
     return data.data;
   } catch (error) {
@@ -41,11 +34,12 @@ const getConversationByUserAndMe = async (userId, token) => {
   }
 };
 
-const createConversation = async (conversation, token) => {
+const createConversation = async (conversation) => {
   try {
-    const { data } = await axiosInstance.post("/", conversation, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const { data } = await axiosAuth.post(
+      "/api/v1/conversations",
+      conversation
+    );
 
     return data.data;
   } catch (error) {
@@ -53,13 +47,12 @@ const createConversation = async (conversation, token) => {
   }
 };
 
-const removeUserForConversation = async (userId, conversationId, token) => {
+const removeUserForConversation = async (userId, conversationId) => {
   try {
-    const { data } = await axiosInstance.put(
-      `/${conversationId}/remove-user`,
-      { userId },
+    const { data } = await axiosAuth.put(
+      `/api/v1/conversations/${conversationId}/remove-user`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        userId,
       }
     );
 
@@ -69,13 +62,12 @@ const removeUserForConversation = async (userId, conversationId, token) => {
   }
 };
 
-const addUserForConversation = async (userId, conversationId, token) => {
+const addUserForConversation = async (userId, conversationId) => {
   try {
-    const { data } = await axiosInstance.put(
-      `/${conversationId}/add-user`,
-      { userId },
+    const { data } = await axiosAuth.put(
+      `/api/v1/conversations/${conversationId}/add-user`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        userId,
       }
     );
 
@@ -85,13 +77,25 @@ const addUserForConversation = async (userId, conversationId, token) => {
   }
 };
 
-const removeYourselfForConversation = async (conversationId, token) => {
+const removeYourselfForConversation = async (conversationId) => {
   try {
-    const { data } = await axiosInstance.put(
-      `/${conversationId}/remove-yourself`,
-      {},
+    const { data } = await axiosAuth.put(
+      `/api/v1/conversations/${conversationId}/remove-yourself`,
+      {}
+    );
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const assignAdminForConversation = async (userId, conversationId) => {
+  try {
+    const { data } = await axiosAuth.put(
+      `/api/v1/conversations/${conversationId}/assign-admin`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        userId,
       }
     );
 
@@ -101,27 +105,11 @@ const removeYourselfForConversation = async (conversationId, token) => {
   }
 };
 
-const assignAdminForConversation = async (userId, conversationId, token) => {
+const deleteConversation = async (conversationId) => {
   try {
-    const { data } = await axiosInstance.put(
-      `/${conversationId}/assign-admin`,
-      { userId },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+    const { data } = await axiosAuth.delete(
+      `/api/v1/conversations/${conversationId}`
     );
-
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const deleteConversation = async (conversationId, token) => {
-  try {
-    const { data } = await axiosInstance.delete(`/${conversationId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
 
     return data;
   } catch (error) {

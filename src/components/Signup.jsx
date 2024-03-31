@@ -1,17 +1,24 @@
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const Signup = ({ handleSignup }) => {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
 
+  const [showPassword, setShowPassword] = useState("password");
+  const [showRePassword, setShowRePassword] = useState("password");
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleSignup(fullName, phoneNumber, password, rePassword);
+    handleSignup(fullName, email, phoneNumber, password, rePassword);
     setFullName("");
     setPhoneNumber("");
+    setEmail("");
     setPassword("");
     setRePassword("");
   };
@@ -37,25 +44,88 @@ const Signup = ({ handleSignup }) => {
         style={{ marginBottom: "20px" }}
       />
       <TextField
-        id="password"
-        label="Mật khẩu"
-        type="password"
+        id="email"
+        label="Email"
         variant="standard"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         fullWidth
         style={{ marginBottom: "20px" }}
       />
-      <TextField
-        id="rePassword"
-        label="Nhập lại mật khẩu"
-        type="password"
-        variant="standard"
-        value={rePassword}
-        onChange={(e) => setRePassword(e.target.value)}
-        fullWidth
-        style={{ marginBottom: "20px" }}
-      />
+      <Box
+        sx={{
+          position: "relative",
+        }}
+      >
+        <TextField
+          id="password"
+          label="Mật khẩu"
+          type={showPassword}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          variant="standard"
+          fullWidth
+          style={{ marginBottom: "20px" }}
+        />
+        {showPassword === "password" ? (
+          <VisibilityIcon
+            onClick={() => setShowPassword("text")}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "15px",
+              cursor: "pointer",
+            }}
+          />
+        ) : (
+          <VisibilityOffIcon
+            onClick={() => setShowPassword("password")}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "15px",
+              cursor: "pointer",
+            }}
+          />
+        )}
+      </Box>
+      <Box
+        sx={{
+          position: "relative",
+        }}
+      >
+        <TextField
+          id="rePassword"
+          label="Nhập lại mật khẩu"
+          type={showRePassword}
+          value={rePassword}
+          onChange={(e) => setRePassword(e.target.value)}
+          variant="standard"
+          fullWidth
+          style={{ marginBottom: "20px" }}
+        />
+        {showRePassword === "password" ? (
+          <VisibilityIcon
+            onClick={() => setShowRePassword("text")}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "15px",
+              cursor: "pointer",
+            }}
+          />
+        ) : (
+          <VisibilityOffIcon
+            onClick={() => setShowRePassword("password")}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "15px",
+              cursor: "pointer",
+            }}
+          />
+        )}
+      </Box>
       <Button
         variant="contained"
         fullWidth

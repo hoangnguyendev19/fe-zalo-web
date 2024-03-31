@@ -1,18 +1,8 @@
-import axios from "axios";
+import { axiosAuth } from '../utils/axiosConfig';
 
-const axiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_REACT_APP_API_URL}/messages`,
-  headers: { "Content-Type": "application/json" },
-});
-
-const getAllMessageForConversation = async (conversationId, token) => {
+const getAllMessageForConversation = async (conversationId) => {
   try {
-    const { data } = await axiosInstance.get(
-      `?conversation=${conversationId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const { data } = await axiosAuth.get(`/api/v1/messages?conversation=${conversationId}`);
 
     return data.data;
   } catch (error) {
@@ -20,11 +10,9 @@ const getAllMessageForConversation = async (conversationId, token) => {
   }
 };
 
-const createMessage = async (message, token) => {
+const createMessage = async (message) => {
   try {
-    const { data } = await axiosInstance.post("/", message, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const { data } = await axiosAuth.post('/api/v1/messages', message);
 
     return data.data;
   } catch (error) {
@@ -32,15 +20,9 @@ const createMessage = async (message, token) => {
   }
 };
 
-const revokeMessage = async (messageId, token) => {
+const revokeMessage = async (messageId) => {
   try {
-    const { data } = await axiosInstance.put(
-      `/${messageId}`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const { data } = await axiosAuth.put(`/api/v1/messages/${messageId}`, {});
 
     return data;
   } catch (error) {
@@ -48,9 +30,5 @@ const revokeMessage = async (messageId, token) => {
   }
 };
 
-const MessageAPI = {
-  getAllMessageForConversation,
-  createMessage,
-  revokeMessage,
-};
+const MessageAPI = { getAllMessageForConversation, createMessage, revokeMessage };
 export default MessageAPI;

@@ -1,5 +1,4 @@
 import {
-  styled,
   Modal,
   Button,
   IconButton,
@@ -27,7 +26,7 @@ import {
   convertDateToDateObj,
   convertToDate,
   convertToDateTime,
-} from "../utils";
+} from "../utils/handler";
 import UserAPI from "../api/UserAPI";
 import UploadAPI from "../api/UploadAPI";
 import { setUser } from "../redux/userSlice";
@@ -38,7 +37,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  height: "550px",
+  height: "580px",
   bgcolor: "background.paper",
   borderRadius: "5px",
   boxShadow: 24,
@@ -195,6 +194,7 @@ function InfoBody({ changeBody, handleCloseModal, user }) {
         dateOfBirth={
           user?.dateOfBirth ? user.dateOfBirth : new Date().getTime()
         }
+        email={user?.email ? user.email : ""}
         phoneNumber={user?.phoneNumber ? user.phoneNumber : ""}
       />
       {/* line break */}
@@ -369,7 +369,7 @@ function AvatarUploader({ changeBody, handleCloseModal }) {
   const [imageUri, setImageUri] = useState(null);
   const [fileImg, setFileImg] = useState();
   const [scale, setScale] = useState(1.2);
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
@@ -398,7 +398,7 @@ function AvatarUploader({ changeBody, handleCloseModal }) {
         avatarUrl,
         coverImage: user?.coverImage,
       };
-      const data = await UserAPI.updateMe(newUser, accessToken);
+      const data = await UserAPI.updateMe(newUser);
       if (data) {
         dispatch(setUser(data));
         setLoading(false);
@@ -573,11 +573,11 @@ function AvatarUploader({ changeBody, handleCloseModal }) {
 }
 
 function ImageUploader({ changeBody, handleCloseModal }) {
-  const [open, setOpen] = useState(false); // Hiển thị
+  const [open, setOpen] = useState(false);
   const [imageUri, setImageUri] = useState(null);
   const [fileImg, setFileImg] = useState();
   const [scale, setScale] = useState(1.2);
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
 
@@ -606,7 +606,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
         avatarUrl: user?.avatarUrl,
         coverImage: imageUrl,
       };
-      const data = await UserAPI.updateMe(newUser, accessToken);
+      const data = await UserAPI.updateMe(newUser);
       if (data) {
         dispatch(setUser(data));
         setLoading(false);
@@ -777,7 +777,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
   );
 }
 
-function Info({ gender, dateOfBirth, phoneNumber }) {
+function Info({ gender, dateOfBirth, email, phoneNumber }) {
   return (
     <Box marginLeft={2}>
       <Typography fontWeight={"bold"} fontSize="16px" marginBottom="10px">
@@ -809,6 +809,14 @@ function Info({ gender, dateOfBirth, phoneNumber }) {
           >
             Điện thoại
           </Typography>
+          <Typography
+            variant="body1"
+            sx={{ color: "gray" }}
+            fontSize="14px"
+            marginBottom="10px"
+          >
+            Email
+          </Typography>
         </Grid>
         <Grid item>
           <Typography variant="body1" fontSize="14px" marginBottom="10px">
@@ -820,15 +828,20 @@ function Info({ gender, dateOfBirth, phoneNumber }) {
           <Typography variant="body1" fontSize="14px" marginBottom="10px">
             {phoneNumber}
           </Typography>
+          <Typography variant="body1" fontSize="14px" marginBottom="10px">
+            {email}
+          </Typography>
         </Grid>
       </Grid>
     </Box>
   );
 }
+
 function InfoEdit({ changeBody, handleCloseModal }) {
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [value, setValue] = useState(user?.fullName ? user.fullName : "");
+  const [fullName, setFullName] = useState(user?.fullName ? user.fullName : "");
+  const [email, setEmail] = useState(user?.email ? user.email : "");
   const [gender, setGender] = useState(user?.gender);
   const [date, setDate] = useState(
     user?.dateOfBirth
@@ -846,20 +859,18 @@ function InfoEdit({ changeBody, handleCloseModal }) {
       setGender(false);
     }
   };
-  const handleChangeName = (event) => {
-    setValue(event.target.value);
-  };
 
   const handleChangeProfile = async () => {
     const newUser = {
-      fullName: value,
+      fullName,
       gender,
+      email,
       dateOfBirth: convertDateToDateObj(date),
       avatarUrl: user?.avatarUrl,
       coverImage: user?.coverImage,
     };
 
-    const data = await UserAPI.updateMe(newUser, accessToken);
+    const data = await UserAPI.updateMe(newUser);
     if (data) {
       dispatch(setUser(data));
       changeBody("default");
@@ -904,8 +915,25 @@ function InfoEdit({ changeBody, handleCloseModal }) {
                 border: "1px solid #A0A0A0",
                 boxSizing: "border-box",
               }}
-              value={value}
-              onChange={handleChangeName}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </Box>
+          <Box>
+            <Typography fontSize="14px" marginBottom="10px">
+              Email
+            </Typography>
+            <input
+              type="text"
+              style={{
+                width: "100%",
+                padding: "10px",
+                borderRadius: "5px",
+                border: "1px solid #A0A0A0",
+                boxSizing: "border-box",
+              }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </Box>
           <Box>

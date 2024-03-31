@@ -39,14 +39,13 @@ export default function AddMember({
   setConversation,
 }) {
   const handleCloseModal = () => setOpenModal(false);
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleAddMember = async (id) => {
     const data = await ConversationAPI.addUserForConversation(
       id,
-      conversation.id,
-      accessToken
+      conversation.id
     );
     if (data) {
       dispatch(addUser({ conversationId: conversation.id, user: data }));
@@ -86,7 +85,7 @@ export default function AddMember({
           </IconButton>
         </Box>
         <Divider />
-        <Box sx={{}}>
+        <Box>
           {user?.friendList &&
             user?.friendList?.map((friend) => {
               if (
@@ -94,6 +93,7 @@ export default function AddMember({
               ) {
                 return (
                   <Box
+                    key={friend.id}
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -113,6 +113,7 @@ export default function AddMember({
               } else {
                 return (
                   <Box
+                    key={friend.id}
                     sx={{
                       display: "flex",
                       alignItems: "center",

@@ -16,7 +16,7 @@ import CreateGroup from "../components/CreateGroup";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Chat from "../components/Chat";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import ConversationAPI from "../api/ConversationAPI";
 import { getAllConversations } from "../redux/conversationSlice";
@@ -50,7 +50,6 @@ const Messager = () => {
   const [value, setValue] = useState(0);
   const { conversations } = useSelector((state) => state.conversation);
   const [conversation, setConversation] = useState(null);
-  const { accessToken } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleChange = (event, newValue) => {
@@ -59,14 +58,14 @@ const Messager = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await ConversationAPI.getAllConversationForUser(accessToken);
+      const data = await ConversationAPI.getAllConversationForUser();
       if (data) {
         dispatch(getAllConversations(data));
       }
     };
 
     fetchData();
-  }, [dispatch, accessToken]);
+  }, [dispatch]);
 
   return (
     <Grid container item xs={11.3}>

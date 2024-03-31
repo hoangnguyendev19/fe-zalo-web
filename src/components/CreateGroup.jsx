@@ -22,7 +22,7 @@ import ConversationAPI from "../api/ConversationAPI";
 import { createConversation } from "../redux/conversationSlice";
 
 export default function CreateGroup() {
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const [name, setName] = useState("");
   const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
@@ -57,7 +57,7 @@ export default function CreateGroup() {
       type: "GROUP",
     };
 
-    const data = await ConversationAPI.createConversation(conver, accessToken);
+    const data = await ConversationAPI.createConversation(conver);
     if (data) {
       dispatch(createConversation(data));
       toast.success("Tạo nhóm thành công");

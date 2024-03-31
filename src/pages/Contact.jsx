@@ -25,7 +25,7 @@ const Contact = () => {
   const [show, setShow] = useState("ListFriend");
   const [conversation, setConversation] = useState(null);
   const { conversations } = useSelector((state) => state.conversation);
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleOpenFriendChat = async (id) => {
@@ -45,10 +45,7 @@ const Contact = () => {
         members: [user.id, id],
         admin: user.id,
       };
-      const data = await ConversationAPI.createConversation(
-        newConver,
-        accessToken
-      );
+      const data = await ConversationAPI.createConversation(newConver);
       if (data) {
         dispatch(createConversation(data));
         setConversation(data);

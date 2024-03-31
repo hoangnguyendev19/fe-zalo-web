@@ -21,7 +21,7 @@ import { setUser } from "../redux/userSlice";
 export default function AddFriend() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [open, setOpen] = useState(false);
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [friend, setFriend] = useState(null);
   const [status, setStatus] = useState("request"); // request - accept - revoke - friend
@@ -55,7 +55,7 @@ export default function AddFriend() {
   };
 
   const handleRequestFriend = async () => {
-    const data = await UserAPI.requestFriend(friend.id, accessToken);
+    const data = await UserAPI.requestFriend(friend.id);
     if (data) {
       dispatch(setUser(data));
       setStatus("revoke");
@@ -63,7 +63,7 @@ export default function AddFriend() {
   };
 
   const handleRevokeFriend = async () => {
-    const data = await UserAPI.revokeFriend(friend.id, accessToken);
+    const data = await UserAPI.revokeFriend(friend.id);
     if (data) {
       dispatch(setUser(data));
       setStatus("request");
@@ -71,7 +71,7 @@ export default function AddFriend() {
   };
 
   const handleAcceptFriend = async () => {
-    const data = await UserAPI.acceptFriend(friend.id, accessToken);
+    const data = await UserAPI.acceptFriend(friend.id);
     if (data) {
       dispatch(setUser(data));
       setStatus("friend");
@@ -79,7 +79,7 @@ export default function AddFriend() {
   };
 
   const handleDeleteAcceptFriend = async () => {
-    const data = await UserAPI.deleteAcceptFriend(friend.id, accessToken);
+    const data = await UserAPI.deleteAcceptFriend(friend.id);
     if (data) {
       dispatch(setUser(data));
       setStatus("request");

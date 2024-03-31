@@ -16,7 +16,7 @@ import { setUser } from "../redux/userSlice";
 import InforProfile from "./InforProfile";
 
 const RequestFriend = ({ handleOpenChat }) => {
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const [openModalReceiver, setOpenModalReceiver] = useState(false);
@@ -27,21 +27,21 @@ const RequestFriend = ({ handleOpenChat }) => {
   };
 
   const handleRevokeFriend = async (id) => {
-    const data = await UserAPI.revokeFriend(id, accessToken);
+    const data = await UserAPI.revokeFriend(id);
     if (data) {
       dispatch(setUser(data));
     }
   };
 
   const handleAcceptFriend = async (id) => {
-    const data = await UserAPI.acceptFriend(id, accessToken);
+    const data = await UserAPI.acceptFriend(id);
     if (data) {
       dispatch(setUser(data));
     }
   };
 
   const handleDeleteAcceptFriend = async (id) => {
-    const data = await UserAPI.deleteAcceptFriend(id, accessToken);
+    const data = await UserAPI.deleteAcceptFriend(id);
     if (data) {
       dispatch(setUser(data));
     }

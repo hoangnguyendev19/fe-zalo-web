@@ -2,14 +2,14 @@ import {
   AccordionSummary,
   Box,
   Button,
-  Link,
   TextField,
   Typography,
   Accordion,
   AccordionDetails,
 } from "@mui/material";
 import { useState } from "react";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { toast } from "react-toastify";
 import UserAPI from "../api/UserAPI";
@@ -18,6 +18,7 @@ const Login = ({ handleLogin }) => {
   const [phoneNumber, setPhoneNumber] = useState("0123456789");
   const [password, setPassword] = useState("huynguyen@123");
   const [email, setEmail] = useState("");
+  const [showPassword, setShowPassword] = useState("password");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,16 +57,43 @@ const Login = ({ handleLogin }) => {
         fullWidth
         style={{ marginBottom: "20px" }}
       />
-      <TextField
-        id="password"
-        label="Mật khẩu"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        variant="standard"
-        fullWidth
-        style={{ marginBottom: "20px" }}
-      />
+      <Box
+        sx={{
+          position: "relative",
+        }}
+      >
+        <TextField
+          id="password"
+          label="Mật khẩu"
+          type={showPassword}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          variant="standard"
+          fullWidth
+          style={{ marginBottom: "20px" }}
+        />
+        {showPassword === "password" ? (
+          <VisibilityIcon
+            onClick={() => setShowPassword("text")}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "15px",
+              cursor: "pointer",
+            }}
+          />
+        ) : (
+          <VisibilityOffIcon
+            onClick={() => setShowPassword("password")}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "15px",
+              cursor: "pointer",
+            }}
+          />
+        )}
+      </Box>
       <Button
         variant="contained"
         fullWidth

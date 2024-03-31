@@ -18,7 +18,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ModalImage from "./ModalImage";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convertToDate } from "../utils";
+import { convertToDate } from "../utils/handler";
 import UserAPI from "../api/UserAPI";
 import { setUser } from "../redux/userSlice";
 import { toast } from "react-toastify";
@@ -30,12 +30,11 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  height: "550px",
+  height: "580px",
   bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: "5px",
   overflowY: "auto",
-  // hide scrollbar
   "&::-webkit-scrollbar": {
     display: "none",
   },
@@ -47,7 +46,6 @@ export default function InforProfile({ openModal, setOpenModal, friend }) {
   const [body, setBody] = useState("default");
   const [userInfo, setUserInfo] = useState({});
   const [sameGroup, setSameGroup] = useState([]);
-  const { accessToken } = useSelector((state) => state.user);
 
   const changeBody = (body) => {
     setBody(body);
@@ -58,8 +56,7 @@ export default function InforProfile({ openModal, setOpenModal, friend }) {
       const data = await UserAPI.getUserById(friend?.id);
       if (data) {
         const groups = await ConversationAPI.getConversationByUserAndMe(
-          data.id,
-          accessToken
+          data.id
         );
         setUserInfo(data);
         setSameGroup(groups);
@@ -67,7 +64,7 @@ export default function InforProfile({ openModal, setOpenModal, friend }) {
     };
 
     fetchData();
-  }, [friend, accessToken]);
+  }, [friend]);
 
   return (
     <Modal
@@ -174,6 +171,7 @@ function InfoBody({ changeBody, handleCloseModal, userInfo }) {
           userInfo?.dateOfBirth ? userInfo.dateOfBirth : new Date().getTime()
         }
         phoneNumber={userInfo?.phoneNumber ? userInfo.phoneNumber : ""}
+        email={userInfo?.email ? userInfo.email : ""}
       />
       {/* line break */}
       <Box sx={{ marginBottom: "10px" }}>
@@ -256,7 +254,7 @@ function AvatarHome({ fullName, avatarUrl, coverImage }) {
   );
 }
 
-function Info({ gender, dateOfBirth, phoneNumber }) {
+function Info({ gender, dateOfBirth, phoneNumber, email }) {
   return (
     <Box marginLeft={2}>
       <Typography fontWeight={"bold"} fontSize="16px" marginBottom="10px">
@@ -288,6 +286,14 @@ function Info({ gender, dateOfBirth, phoneNumber }) {
           >
             Điện thoại
           </Typography>
+          <Typography
+            variant="body1"
+            sx={{ color: "gray" }}
+            fontSize="14px"
+            marginBottom="10px"
+          >
+            Email
+          </Typography>
         </Grid>
         <Grid item>
           <Typography variant="body1" fontSize="14px" marginBottom="10px">
@@ -299,6 +305,9 @@ function Info({ gender, dateOfBirth, phoneNumber }) {
           <Typography variant="body1" fontSize="14px" marginBottom="10px">
             {phoneNumber}
           </Typography>
+          <Typography variant="body1" fontSize="14px" marginBottom="10px">
+            {email}
+          </Typography>
         </Grid>
       </Grid>
     </Box>
@@ -306,11 +315,11 @@ function Info({ gender, dateOfBirth, phoneNumber }) {
 }
 
 function AnotherFunctions({ changeBody, userInfo, handleCloseModal }) {
-  const { user, accessToken } = useSelector((state) => state.user);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleDeleteFriend = async () => {
-    const data = await UserAPI.deleteFriend(userInfo.id, accessToken);
+    const data = await UserAPI.deleteFriend(userInfo.id);
     if (data) {
       dispatch(setUser(data));
       handleCloseModal();
@@ -370,8 +379,8 @@ function GroupChat({ changeBody, handleCloseModal, sameGroup }) {
         </Box>
         <Box sx={{ overflowY: "scroll", height: "430px" }}>
           <List>
-            {sameGroup.length > 0 &&
-              sameGroup.map((group) => (
+            {sameGroup?.length > 0 &&
+              sameGroup?.map((group) => (
                 <ListItemButton key={group.id}>
                   <AvatarGroup max={2}>
                     {group.members.map((member) => (

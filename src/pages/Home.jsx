@@ -20,7 +20,7 @@ import Loading from "../components/Loading";
 import Profile from "../components/Profile";
 import { useDispatch, useSelector } from "react-redux";
 import UserAPI from "../api/UserAPI";
-import { logout } from "../redux/userSlice";
+import { logout, setUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,6 +38,21 @@ const Home = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
+
+  useEffect(() => {
+    if (!user) {
+      const fetchData = async () => {
+        const data = await UserAPI.getMe();
+        if (data) {
+          dispatch(setUser(data));
+        } else {
+          navigate("/");
+        }
+      };
+
+      fetchData();
+    }
+  }, [user, navigate]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
