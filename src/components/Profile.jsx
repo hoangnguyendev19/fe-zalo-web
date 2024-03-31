@@ -389,7 +389,7 @@ function AvatarUploader({ changeBody, handleCloseModal }) {
     setLoading(true);
     const formData = new FormData();
     formData.append("file", fileImg);
-    const avatarUrl = await UploadAPI.uploadFile(formData);
+    const avatarUrl = await UploadAPI.uploadImage(formData);
     if (avatarUrl) {
       const newUser = {
         fullName: user.fullName,
@@ -597,7 +597,7 @@ function ImageUploader({ changeBody, handleCloseModal }) {
     setLoading(true);
     const formData = new FormData();
     formData.append("file", fileImg);
-    const imageUrl = await UploadAPI.uploadFile(formData);
+    const imageUrl = await UploadAPI.uploadImage(formData);
     if (imageUrl) {
       const newUser = {
         fullName: user.fullName,
