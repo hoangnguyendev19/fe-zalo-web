@@ -16,7 +16,7 @@ import UserAPI from "../api/UserAPI";
 
 const Login = ({ handleLogin }) => {
   const [phoneNumber, setPhoneNumber] = useState("0123456789");
-  const [password, setPassword] = useState("huynguyen@123");
+  const [password, setPassword] = useState("hoangnguyen@123");
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState("password");
 
