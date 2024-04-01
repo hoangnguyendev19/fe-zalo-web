@@ -54,6 +54,15 @@ export default function ChangePassword() {
       return;
     }
 
+    if (
+      password.length < 10 ||
+      newPassword.length < 10 ||
+      confirmPassword.length < 10
+    ) {
+      toast.error("Mật khẩu phải có ít nhất 10 ký tự");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       toast.error("Mật khẩu mới không trùng khớp");
       return;

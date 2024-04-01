@@ -85,7 +85,7 @@ const Start = () => {
   };
 
   const handleLogin = async (phoneNumber, password) => {
-    if (phoneNumber === "") {
+    if (phoneNumber.trim() === "") {
       toast.error("Bạn chưa nhập số điện thoại!");
       return;
     }
@@ -94,7 +94,7 @@ const Start = () => {
       return;
     }
 
-    if (password === "") {
+    if (password.trim() === "") {
       toast.error("Bạn chưa nhập mật khẩu!");
       return;
     }
@@ -130,6 +130,11 @@ const Start = () => {
 
     if (phoneNumber.trim() === "") {
       toast.error("Bạn chưa nhập số điện thoại!");
+      return;
+    }
+
+    if (isNaN(phoneNumber)) {
+      toast.error("Số điện thoại không hợp lệ!");
       return;
     }
 
