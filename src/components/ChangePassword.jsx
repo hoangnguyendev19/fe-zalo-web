@@ -6,14 +6,16 @@ import {
   Box,
   ListItemButton,
   Divider,
+  TextField,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useEffect, useState, useRef, memo, useLayoutEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 import UserAPI from "../api/UserAPI";
 import { toast } from "react-toastify";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const style = {
   position: "absolute",
@@ -21,7 +23,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  height: "380px",
+  height: "400px",
   bgcolor: "background.paper",
   borderRadius: "5px",
   boxShadow: 24,
@@ -39,6 +41,10 @@ export default function ChangePassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [showPassword, setShowPassword] = useState("password");
+  const [showNewPassword, setShowNewPassword] = useState("password");
+  const [showConfirmPassword, setShowConfirmPassword] = useState("password");
+
   const handleOpenModal = () => {
     setOpenModal(true);
   };
@@ -51,6 +57,15 @@ export default function ChangePassword() {
       confirmPassword.trim() === ""
     ) {
       toast.error("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    if (
+      password.length < 10 ||
+      newPassword.length < 10 ||
+      confirmPassword.length < 10
+    ) {
+      toast.error("Mật khẩu phải có ít nhất 10 ký tự");
       return;
     }
 
@@ -111,57 +126,126 @@ export default function ChangePassword() {
               padding: "10px",
             }}
           >
-            <Box>
-              <Typography fontSize="14px" marginBottom="10px">
-                Mật khẩu hiện tại
+            <Box
+              sx={{
+                position: "relative",
+              }}
+            >
+              <Typography fontSize="14px">
+                Mật khẩu hiện tại<span style={{ color: "red" }}>*</span>
               </Typography>
-              <input
-                type="password"
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #A0A0A0",
-                  boxSizing: "border-box",
-                }}
+              <TextField
+                id="password"
+                placeholder="Nhập mật khẩu hiện tại"
+                type={showPassword}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                variant="standard"
+                fullWidth
+                style={{ marginBottom: "20px" }}
               />
+              {showPassword === "password" ? (
+                <VisibilityIcon
+                  onClick={() => setShowPassword("text")}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "15px",
+                    cursor: "pointer",
+                  }}
+                />
+              ) : (
+                <VisibilityOffIcon
+                  onClick={() => setShowPassword("password")}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "15px",
+                    cursor: "pointer",
+                  }}
+                />
+              )}
             </Box>
 
-            <Box>
-              <Typography fontSize="14px" marginBottom="10px">
-                Mật khẩu mới
+            <Box
+              sx={{
+                position: "relative",
+              }}
+            >
+              <Typography fontSize="14px">
+                Mật khẩu mới<span style={{ color: "red" }}>*</span>
               </Typography>
-              <input
-                type="password"
-                style={{
-                  minWidth: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #A0A0A0",
-                  boxSizing: "border-box",
-                }}
+              <TextField
+                id="newPassword"
+                placeholder="Nhập mật khẩu mới"
+                type={showNewPassword}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                variant="standard"
+                fullWidth
+                style={{ marginBottom: "20px" }}
               />
+              {showNewPassword === "password" ? (
+                <VisibilityIcon
+                  onClick={() => setShowNewPassword("text")}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "15px",
+                    cursor: "pointer",
+                  }}
+                />
+              ) : (
+                <VisibilityOffIcon
+                  onClick={() => setShowNewPassword("password")}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "15px",
+                    cursor: "pointer",
+                  }}
+                />
+              )}
             </Box>
-            <Box>
-              <Typography fontSize="14px" marginBottom="10px">
-                Nhập lại mật khẩu mới
+            <Box
+              sx={{
+                position: "relative",
+              }}
+            >
+              <Typography fontSize="14px">
+                Nhập lại mật khẩu mới<span style={{ color: "red" }}>*</span>
               </Typography>
-              <input
-                type="password"
-                style={{
-                  minWidth: "100%",
-                  padding: "10px",
-                  borderRadius: "5px",
-                  border: "1px solid #A0A0A0",
-                  boxSizing: "border-box",
-                }}
+              <TextField
+                id="confirmPassword"
+                placeholder="Nhập lại mật khẩu mới"
+                type={showConfirmPassword}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                variant="standard"
+                fullWidth
+                style={{ marginBottom: "20px" }}
               />
+              {showConfirmPassword === "password" ? (
+                <VisibilityIcon
+                  onClick={() => setShowConfirmPassword("text")}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "15px",
+                    cursor: "pointer",
+                  }}
+                />
+              ) : (
+                <VisibilityOffIcon
+                  onClick={() => setShowConfirmPassword("password")}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "15px",
+                    cursor: "pointer",
+                  }}
+                />
+              )}
             </Box>
           </Box>
           <Box

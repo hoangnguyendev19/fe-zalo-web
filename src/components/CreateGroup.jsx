@@ -15,28 +15,39 @@ import {
   Checkbox,
   ListItemButton,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import ConversationAPI from "../api/ConversationAPI";
 import { createConversation } from "../redux/conversationSlice";
 
-export default function CreateGroup() {
+export default function CreateGroup({ socket }) {
   const { user } = useSelector((state) => state.user);
   const [name, setName] = useState("");
   const [members, setMembers] = useState([]);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_create_group", (data) => {
+        if (data.status === "success") {
+          dispatch(createConversation(data.data));
+          toast.success("Tạo nhóm thành công");
+          setName("");
+          setOpen(false);
+        } else if (data.status === "fail") {
+          toast.error("Tạo nhóm thất bại");
+        }
+      });
+    }
+  }, [socket]);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const addMember = (id) => {
-    setMembers([...members, id]);
   };
 
   const handleCreateGroup = async () => {
@@ -57,14 +68,17 @@ export default function CreateGroup() {
       type: "GROUP",
     };
 
-    const data = await ConversationAPI.createConversation(conver);
-    if (data) {
-      dispatch(createConversation(data));
-      toast.success("Tạo nhóm thành công");
-      setName("");
-      setOpen(false);
-    } else {
-      toast.error("Tạo nhóm thất bại");
+    // const data = await ConversationAPI.createConversation(conver);
+    // if (data) {
+    //   dispatch(createConversation(data));
+    //   toast.success("Tạo nhóm thành công");
+    //   setName("");
+    //   setOpen(false);
+    // } else {
+    //   toast.error("Tạo nhóm thất bại");
+    // }
+    if (socket) {
+      socket.emit("send_create_group", conver);
     }
   };
 
@@ -202,7 +216,7 @@ export default function CreateGroup() {
                       <CardCheck
                         key={friend.id}
                         friend={friend}
-                        addMember={addMember}
+                        setMembers={setMembers}
                       />
                     ))}
                 </List>
@@ -232,8 +246,18 @@ export default function CreateGroup() {
   );
 }
 
-function CardCheck({ friend, addMember }) {
+function CardCheck({ friend, setMembers }) {
   const [checked, setChecked] = useState(false);
+
+  const handleChecked = () => {
+    setChecked(!checked);
+    setMembers((prev) => {
+      if (checked) {
+        return prev.filter((item) => item !== friend.id);
+      }
+      return [...prev, friend.id];
+    });
+  };
 
   return (
     <ListItemButton
@@ -242,10 +266,7 @@ function CardCheck({ friend, addMember }) {
         paddingLeft: "5px",
         paddingRight: "0px",
       }}
-      onClick={() => {
-        setChecked(!checked);
-        addMember(friend.id);
-      }}
+      onClick={handleChecked}
     >
       <Box
         sx={{

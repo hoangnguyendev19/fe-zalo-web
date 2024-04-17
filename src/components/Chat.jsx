@@ -14,17 +14,15 @@ import {
   ListItemIcon,
   CircularProgress,
 } from "@mui/material";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ImageIcon from "@mui/icons-material/Image";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { useEffect, useState } from "react";
-import CreateGroup from "./CreateGroup";
 import { useDispatch, useSelector } from "react-redux";
 import MessageSender from "./MessageSender";
 import MessageReceiver from "./MessageReceiver";
 import MessageAPI from "../api/MessageAPI";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -39,15 +37,20 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import AddMember from "./AddMember";
 import GroupMember from "./GroupMember";
 import { toast } from "react-toastify";
+import CircleIcon from "@mui/icons-material/Circle";
+import PersonIcon from "@mui/icons-material/Person";
+import connectSocket from "../utils/socketConfig";
 
 const Chat = ({ conversation, setConversation }) => {
   const { name, members, admin, type, id } = conversation;
   const { user } = useSelector((state) => state.user);
-  const [friend, setFriend] = useState({});
+  const [friend, setFriend] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [socket, setSocket] = useState(null);
+  const socket = connectSocket();
   const [content, setContent] = useState("");
-  const [typeMsg, setTypeMsg] = useState("TEXT"); // TEXT - IMAGE - FILE - VIDEO
+  const [online, isOnline] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [userTyping, setUserTyping] = useState("");
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,11 +63,51 @@ const Chat = ({ conversation, setConversation }) => {
     setOpen(newOpen);
   };
 
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_delete_conversation", (data) => {
+        if (data.status === "success") {
+          dispatch(deleteConversation(data.data));
+          setConversation(null);
+          toast.success("Bạn đã xoá cuộc hội thoại thành công!");
+        }
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_delete_group", (data) => {
+        if (data.status === "success") {
+          dispatch(deleteConversation(data.data));
+          setConversation(null);
+          toast.success("Bạn đã giải tán nhóm thành công!");
+        }
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_remove_yourself", (data) => {
+        if (data.status === "success") {
+          dispatch(removeYourself(data.data));
+          setConversation(null);
+          toast.success("Bạn đã rời khỏi nhóm thành công!");
+        }
+      });
+    }
+  }, [socket]);
+
   const handleDeleteConversation = async () => {
-    const data = await ConversationAPI.deleteConversation(conversation.id);
-    if (data) {
-      dispatch(deleteConversation(conversation.id));
-      setConversation(null);
+    // const data = await ConversationAPI.deleteConversation(conversation.id);
+    // if (data) {
+    //   dispatch(deleteConversation(conversation.id));
+    //   setConversation(null);
+    // }
+
+    if (socket) {
+      socket.emit("send_delete_group", id);
     }
   };
 
@@ -73,8 +116,12 @@ const Chat = ({ conversation, setConversation }) => {
       setOpenInforProfile(true);
     }
     if (index === 2) {
-      handleDeleteConversation();
-      toast.success("Bạn đã xoá cuộc trò chuyện thành công!");
+      if (socket) {
+        socket.emit("send_delete_conversation", {
+          conversationId: id,
+          userId: user?.id,
+        });
+      }
     }
   };
 
@@ -95,19 +142,25 @@ const Chat = ({ conversation, setConversation }) => {
       }
 
       if (conversation.members.length === 3) {
-        console.log("remove");
         handleDeleteConversation();
         toast.success("Bạn đã rời khỏi nhóm thành công!");
         return;
       }
 
-      const data = await ConversationAPI.removeYourselfForConversation(
-        conversation.id
-      );
-      if (data) {
-        dispatch(removeYourself(conversation.id));
-        setConversation(null);
-        toast.success("Bạn đã rời khỏi nhóm thành công!");
+      // const data = await ConversationAPI.removeYourselfForConversation(
+      //   conversation.id
+      // );
+      // if (data) {
+      //   dispatch(removeYourself(conversation.id));
+      //   setConversation(null);
+      //   toast.success("Bạn đã rời khỏi nhóm thành công!");
+      // }
+
+      if (socket) {
+        socket.emit("send_remove_yourself", {
+          conversationId: id,
+          userId: user.id,
+        });
       }
     }
   };
@@ -135,7 +188,7 @@ const Chat = ({ conversation, setConversation }) => {
         {conversation.type === "FRIEND" ? (
           <>
             <Avatar
-              src={friend.avatarUrl}
+              src={friend?.avatarUrl}
               alt="avatar"
               sx={{ width: 60, height: 60 }}
             />
@@ -145,7 +198,7 @@ const Chat = ({ conversation, setConversation }) => {
               fontWeight="bold"
               fontSize="18px"
             >
-              {friend.fullName}
+              {friend?.fullName}
             </Typography>
           </>
         ) : (
@@ -170,7 +223,7 @@ const Chat = ({ conversation, setConversation }) => {
       <Divider />
       {conversation.type === "FRIEND" && (
         <List>
-          {["Thông tin cá nhân", "Tắt thông báo", "Xoá cuộc trò chuyện"].map(
+          {["Thông tin cá nhân", "Tắt thông báo", "Xoá cuộc hội thoại"].map(
             (text, index) => (
               <ListItem
                 key={text}
@@ -225,7 +278,7 @@ const Chat = ({ conversation, setConversation }) => {
           ))}
           {conversation.admin === user?.id && (
             <ListItem
-              key={"Xoá cuộc trò chuyện"}
+              key={"Giải tán nhóm"}
               disablePadding
               onClick={handleDeleteConversation}
             >
@@ -233,7 +286,7 @@ const Chat = ({ conversation, setConversation }) => {
                 <ListItemIcon>
                   <DeleteIcon color="error" />
                 </ListItemIcon>
-                <ListItemText primary={"Xoá cuộc trò chuyện"} />
+                <ListItemText primary={"Giải tán nhóm"} />
               </ListItemButton>
             </ListItem>
           )}
@@ -273,20 +326,65 @@ const Chat = ({ conversation, setConversation }) => {
     }
   }, [conversation]);
 
+  // useEffect(() => {
+  //   const newSocket = io(`${import.meta.env.VITE_REACT_APP_SOCKET_URL}`);
+  //   newSocket.emit("join_room", {
+  //     conversationId: conversation.id,
+  //     userId: user.id,
+  //   });
+  //   setSocket(newSocket);
+
+  //   return () => {
+  //     if (newSocket) {
+  //       newSocket.disconnect();
+  //     }
+  //   };
+  // }, []);
+
   useEffect(() => {
-    const newSocket = io(`${import.meta.env.VITE_REACT_APP_SOCKET_URL}`);
-    newSocket.emit("join_room", {
-      conversationId: conversation.id,
-      userId: user.id,
-    });
-    setSocket(newSocket);
+    if (socket) {
+      socket.emit("join_room", {
+        conversationId: conversation.id,
+        userId: user.id,
+      });
+    }
 
     return () => {
-      if (newSocket) {
-        newSocket.disconnect();
+      if (socket) {
+        socket.off("join_room");
       }
     };
-  }, []);
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket && friend) {
+      socket.emit("check_online", friend?.id);
+      socket.on("online_status", (status) => {
+        isOnline(status);
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("online_status");
+      }
+    };
+  }, [socket, friend]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("typing", (fullName) => {
+        setTyping(true);
+        setUserTyping(fullName);
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("typing");
+      }
+    };
+  }, [socket]);
 
   useEffect(() => {
     if (socket) {
@@ -391,6 +489,12 @@ const Chat = ({ conversation, setConversation }) => {
 
   const handleSendImage = async (event) => {
     setLoading(true);
+    // 2000 KB = 2MB = 2097152 bytes
+    if (event.target.files[0].size > 2097152) {
+      toast.error("File quá lớn, vui lòng chọn file dưới 2MB!");
+      setLoading(false);
+      return;
+    }
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append("image", file);
@@ -412,6 +516,12 @@ const Chat = ({ conversation, setConversation }) => {
 
   const handleSendFile = async (event) => {
     setLoading(true);
+    // 2000 KB = 2MB = 2097152 bytes
+    if (event.target.files[0].size > 2097152) {
+      toast.error("File quá lớn, vui lòng chọn file dưới 2MB!");
+      setLoading(false);
+      return;
+    }
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append("file", file);
@@ -431,6 +541,16 @@ const Chat = ({ conversation, setConversation }) => {
     }
   };
 
+  const handleTyping = (event) => {
+    setContent(event.target.value);
+    if (socket) {
+      socket.emit("typing", {
+        conversationId: conversation?.id,
+        userId: user?.id,
+      });
+    }
+  };
+
   return (
     <Box sx={{ width: "100%", height: "100%", paddingLeft: "30px" }}>
       <Box>
@@ -443,7 +563,11 @@ const Chat = ({ conversation, setConversation }) => {
         >
           <Box sx={{ marginRight: "10px" }}>
             {type === "FRIEND" ? (
-              <Avatar alt={friend?.fullName} src={friend?.avatarUrl} />
+              <Avatar
+                style={{ width: "50px", height: "50px" }}
+                alt={friend?.fullName}
+                src={friend?.avatarUrl}
+              />
             ) : (
               <AvatarGroup max={2}>
                 {members?.length > 0 &&
@@ -459,13 +583,51 @@ const Chat = ({ conversation, setConversation }) => {
           </Box>
           <Box>
             {type === "FRIEND" ? (
-              <Typography fontWeight="bold">{friend?.fullName}</Typography>
+              <>
+                <Typography fontWeight="bold" fontSize="18px">
+                  {friend?.fullName}
+                </Typography>
+                {online ? (
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <CircleIcon sx={{ color: "green" }} fontSize="small" />
+                    <Typography
+                      sx={{
+                        color: "gray",
+                        marginLeft: "10px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      Đang online
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <CircleIcon sx={{ color: "gray" }} fontSize="small" />
+                    <Typography
+                      sx={{
+                        color: "gray",
+                        marginLeft: "10px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      Đang offline
+                    </Typography>
+                  </Box>
+                )}
+              </>
             ) : (
-              <Typography fontWeight="bold">{name}</Typography>
+              <>
+                <Typography fontWeight="bold" fontSize="18px">
+                  {name}
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <PersonIcon fontSize="medium" color="black" />
+                  <Typography fontSize="14px" color="black" marginLeft="10px">
+                    {members.length} thành viên
+                  </Typography>
+                </Box>
+              </>
             )}
-            <Box>
-              <PersonOutlineIcon sx={{ color: "gray" }} />
-            </Box>
           </Box>
           <Box sx={{ marginLeft: "auto", color: "#000", padding: "5px" }}>
             <VideocamIcon />
@@ -511,6 +673,11 @@ const Chat = ({ conversation, setConversation }) => {
         </Box>
       </Box>
       <Box>
+        {typing && (
+          <Typography
+            sx={{ color: "gray", padding: "0px 10px" }}
+          >{`${userTyping} đang nhập tin nhắn...`}</Typography>
+        )}
         <Box sx={{ display: "flex", alignItems: "center", padding: "5px 0" }}>
           <Box sx={{ padding: "0px 20px" }}>
             <label htmlFor="uploadImg">
@@ -543,7 +710,7 @@ const Chat = ({ conversation, setConversation }) => {
             variant="outlined"
             fullWidth
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => handleTyping(e)}
           />
           <Button
             size="large"

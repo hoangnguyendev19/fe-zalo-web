@@ -176,7 +176,7 @@ const MessageSender = ({ message, handleRevokeMessage }) => {
           }}
         >
           <KeyboardReturnIcon fontSize={"small"} />
-          <Typography sx={{ p: 2 }} fontSize="14px">
+          <Typography sx={{ p: 1 }} fontSize="12px">
             Thu hồi
           </Typography>
         </Button>

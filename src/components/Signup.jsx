@@ -1,4 +1,4 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -25,41 +25,59 @@ const Signup = ({ handleSignup }) => {
 
   return (
     <Box>
-      <TextField
-        id="fullName"
-        label="Họ và tên"
-        variant="standard"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        fullWidth
-        style={{ marginBottom: "20px" }}
-      />
-      <TextField
-        id="phoneNumber"
-        label="Số điện thoại"
-        variant="standard"
-        value={phoneNumber}
-        onChange={(e) => setPhoneNumber(e.target.value)}
-        fullWidth
-        style={{ marginBottom: "20px" }}
-      />
-      <TextField
-        id="email"
-        label="Email"
-        variant="standard"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        fullWidth
-        style={{ marginBottom: "20px" }}
-      />
+      <Box>
+        <Typography fontSize="14px">
+          Họ và tên<span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          id="fullName"
+          placeholder="Nhập họ và tên"
+          variant="standard"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          fullWidth
+          style={{ marginBottom: "20px" }}
+        />
+      </Box>
+      <Box>
+        <Typography fontSize="14px">
+          Số điện thoại<span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          id="phoneNumber"
+          placeholder="Nhập số điện thoại"
+          variant="standard"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          fullWidth
+          style={{ marginBottom: "20px" }}
+        />
+      </Box>
+      <Box>
+        <Typography fontSize="14px">
+          Email<span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          id="email"
+          placeholder="Nhập email"
+          variant="standard"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          fullWidth
+          style={{ marginBottom: "20px" }}
+        />
+      </Box>
       <Box
         sx={{
           position: "relative",
         }}
       >
+        <Typography fontSize="14px">
+          Mật khẩu<span style={{ color: "red" }}>*</span>
+        </Typography>
         <TextField
           id="password"
-          label="Mật khẩu"
+          placeholder="Nhập mật khẩu"
           type={showPassword}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -73,7 +91,7 @@ const Signup = ({ handleSignup }) => {
             style={{
               position: "absolute",
               right: "10px",
-              top: "15px",
+              top: "20px",
               cursor: "pointer",
             }}
           />
@@ -83,7 +101,7 @@ const Signup = ({ handleSignup }) => {
             style={{
               position: "absolute",
               right: "10px",
-              top: "15px",
+              top: "20px",
               cursor: "pointer",
             }}
           />
@@ -94,9 +112,12 @@ const Signup = ({ handleSignup }) => {
           position: "relative",
         }}
       >
+        <Typography fontSize="14px">
+          Nhập lại mật khẩu<span style={{ color: "red" }}>*</span>
+        </Typography>
         <TextField
           id="rePassword"
-          label="Nhập lại mật khẩu"
+          placeholder="Nhập lại mật khẩu"
           type={showRePassword}
           value={rePassword}
           onChange={(e) => setRePassword(e.target.value)}
@@ -110,7 +131,7 @@ const Signup = ({ handleSignup }) => {
             style={{
               position: "absolute",
               right: "10px",
-              top: "15px",
+              top: "20px",
               cursor: "pointer",
             }}
           />
@@ -120,7 +141,7 @@ const Signup = ({ handleSignup }) => {
             style={{
               position: "absolute",
               right: "10px",
-              top: "15px",
+              top: "20px",
               cursor: "pointer",
             }}
           />

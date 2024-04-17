@@ -14,8 +14,10 @@ const CardItemUser = ({ conver, setConversation }) => {
   const [friend, setFriend] = useState({});
 
   useEffect(() => {
-    const member = members.filter((mem) => mem.id !== user.id);
-    setFriend(member[0]);
+    if (user) {
+      const member = members.filter((mem) => mem.id !== user.id);
+      setFriend(member[0]);
+    }
   }, []);
 
   return (
@@ -34,7 +36,7 @@ const CardItemUser = ({ conver, setConversation }) => {
         <Box>
           <Typography fontWeight="bold">{friend?.fullName}</Typography>
           <Typography color="gray" fontSize="14px">
-            Ban dang dau v
+            {friend?.fullName} đã gửi tin nhắn
           </Typography>
         </Box>
       </ListItemButton>
