@@ -10,7 +10,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import DraftsOutlinedIcon from "@mui/icons-material/DraftsOutlined";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ListFriend from "../components/ListFriend";
 import ListGroup from "../components/ListGroup";
 import RequestFriend from "../components/RequestFriend";
@@ -20,13 +20,28 @@ import Chat from "../components/Chat";
 import { useDispatch, useSelector } from "react-redux";
 import ConversationAPI from "../api/ConversationAPI";
 import { createConversation } from "../redux/conversationSlice";
+import connectSocket from "../utils/socketConfig";
 
 const Contact = () => {
   const [show, setShow] = useState("ListFriend");
   const [conversation, setConversation] = useState(null);
   const { conversations } = useSelector((state) => state.conversation);
   const { user } = useSelector((state) => state.user);
+  const socket = connectSocket();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_create_conversation", (data) => {
+        console.log(data);
+        if (data.status === "success") {
+          dispatch(createConversation(data.data));
+          setConversation(data.data);
+          setShow("Chat");
+        }
+      });
+    }
+  }, [socket]);
 
   const handleOpenFriendChat = async (id) => {
     const conv = conversations.find((conver) => {
@@ -39,19 +54,23 @@ const Contact = () => {
     });
     if (conv) {
       setConversation(conv);
+      setShow("Chat");
     } else {
       const newConver = {
         type: "FRIEND",
         members: [user.id, id],
         admin: user.id,
       };
-      const data = await ConversationAPI.createConversation(newConver);
-      if (data) {
-        dispatch(createConversation(data));
-        setConversation(data);
+      // const data = await ConversationAPI.createConversation(newConver);
+      // if (data) {
+      //   dispatch(createConversation(data));
+      //   setConversation(data);
+      // }
+
+      if (socket) {
+        socket.emit("send_create_conversation", newConver);
       }
     }
-    setShow("Chat");
   };
 
   const handleOpenGroupChat = (conver) => {
@@ -84,10 +103,10 @@ const Contact = () => {
             fullWidth
           />
           <Box sx={{ marginLeft: "5px" }}>
-            <AddFriend />
+            <AddFriend socket={socket} />
           </Box>
           <Box sx={{ marginLeft: "5px" }}>
-            <CreateGroup />
+            <CreateGroup socket={socket} />
           </Box>
         </Box>
         <Box sx={{ width: "100%", marginTop: "10px" }}>

@@ -6,6 +6,7 @@ import {
   Avatar,
   Divider,
   Button,
+  Popover,
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -14,13 +15,19 @@ import ConversationAPI from "../api/ConversationAPI";
 import { assignAdmin, removeUser } from "../redux/conversationSlice";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { toast } from "react-toastify";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import { useEffect, useState } from "react";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import connectSocket from "../utils/socketConfig";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 500,
   height: "550px",
   bgcolor: "background.paper",
   boxShadow: 24,
@@ -42,17 +49,73 @@ export default function GroupMember({
   const handleCloseModal = () => setOpenModal(false);
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const socket = connectSocket();
+  const [memId, setMemId] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const uid = open ? "simple-popover" : undefined;
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_assign_admin", (data) => {
+        if (data.status === "success") {
+          dispatch(assignAdmin(data.data));
+          setConversation({ ...conversation, admin: data.data.userId });
+          handleCloseModal();
+          toast.success("Bạn đã trao quyền trưởng nhóm thành công!");
+        } else if (data.status === "fail") {
+          toast.error("Bạn không thể thực hiện hành động này!");
+        }
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_remove_member", (data) => {
+        if (data.status === "success") {
+          dispatch(removeUser(data.data));
+          setConversation({
+            ...conversation,
+            members: conversation.members.filter(
+              (mem) => mem.id !== data.data.userId
+            ),
+          });
+          handleCloseModal();
+          toast.success("Bạn đã xóa thành viên khỏi nhóm thành công!");
+        } else if (data.status === "fail") {
+          toast.error("Bạn không thể thực hiện hành động này!");
+        }
+      });
+    }
+  }, [socket]);
 
   const handleAssignAdmin = async (id) => {
-    const data = await ConversationAPI.assignAdminForConversation(
-      id,
-      conversation.id
-    );
-    if (data) {
-      dispatch(assignAdmin({ conversationId: conversation.id, userId: id }));
-      setConversation({ ...conversation, admin: id });
-      handleCloseModal();
-      toast.success("Bạn đã trao quyền trưởng nhóm thành công!");
+    // const data = await ConversationAPI.assignAdminForConversation(
+    //   id,
+    //   conversation.id
+    // );
+    // if (data) {
+    //   dispatch(assignAdmin({ conversationId: conversation.id, userId: id }));
+    //   setConversation({ ...conversation, admin: id });
+    //   handleCloseModal();
+    //   toast.success("Bạn đã trao quyền trưởng nhóm thành công!");
+    // }
+
+    if (socket) {
+      socket.emit("send_assign_admin", {
+        conversationId: conversation.id,
+        userId: id,
+      });
     }
   };
 
@@ -62,18 +125,25 @@ export default function GroupMember({
       return;
     }
 
-    const data = await ConversationAPI.removeUserForConversation(
-      id,
-      conversation.id
-    );
-    if (data) {
-      dispatch(removeUser({ conversationId: conversation.id, userId: id }));
-      setConversation({
-        ...conversation,
-        members: conversation.members.filter((mem) => mem.id !== id),
+    // const data = await ConversationAPI.removeUserForConversation(
+    //   id,
+    //   conversation.id
+    // );
+    // if (data) {
+    //   dispatch(removeUser({ conversationId: conversation.id, userId: id }));
+    //   setConversation({
+    //     ...conversation,
+    //     members: conversation.members.filter((mem) => mem.id !== id),
+    //   });
+    //   handleCloseModal();
+    //   toast.success("Bạn đã xóa thành viên khỏi nhóm thành công!");
+    // }
+
+    if (socket) {
+      socket.emit("send_remove_member", {
+        conversationId: conversation.id,
+        userId: id,
       });
-      handleCloseModal();
-      toast.success("Bạn đã xóa thành viên khỏi nhóm thành công!");
     }
   };
 
@@ -154,36 +224,72 @@ export default function GroupMember({
                       {member.fullName}
                     </Typography>
                     {conversation.admin === user.id && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          marginLeft: "auto",
+                      <MoreVertIcon
+                        style={{ marginLeft: "auto" }}
+                        fontSize={"medium"}
+                        onClick={(e) => {
+                          handleClick(e);
+                          setMemId(member.id);
                         }}
-                      >
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          style={{ marginLeft: "auto" }}
-                          onClick={() => handleAssignAdmin(member.id)}
-                        >
-                          Trao
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          style={{ marginLeft: "5px" }}
-                          onClick={() => handleRemoveUser(member.id)}
-                        >
-                          Xóa
-                        </Button>
-                      </Box>
+                      />
                     )}
                   </Box>
                 );
               }
             })}
         </Box>
+        <Popover
+          id={uid}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          <Button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              paddingX: "10px",
+            }}
+            fullWidth
+            color="inherit"
+            onClick={() => {
+              handleAssignAdmin(memId);
+              handleClose();
+            }}
+          >
+            <AssignmentIndIcon fontSize={"small"} />
+            <Typography sx={{ p: 1 }} fontSize="12px">
+              Trao quyền trưởng nhóm
+            </Typography>
+          </Button>
+          <Button
+            style={{
+              display: "flex",
+              alignItems: "center",
+              paddingX: "10px",
+              justifyContent: "flex-start",
+            }}
+            color="inherit"
+            fullWidth
+            onClick={() => {
+              handleRemoveUser(memId);
+              handleClose();
+            }}
+          >
+            <DeleteOutlineIcon fontSize={"small"} />
+            <Typography sx={{ p: 1 }} fontSize="12px">
+              Xoá thành viên
+            </Typography>
+          </Button>
+        </Popover>
       </Box>
     </Modal>
   );

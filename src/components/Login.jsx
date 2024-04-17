@@ -48,23 +48,31 @@ const Login = ({ handleLogin }) => {
 
   return (
     <Box>
-      <TextField
-        id="phoneNumber"
-        label="Số điện thoại"
-        variant="standard"
-        value={phoneNumber}
-        onChange={(e) => setPhoneNumber(e.target.value)}
-        fullWidth
-        style={{ marginBottom: "20px" }}
-      />
+      <Box>
+        <Typography fontSize="14px">
+          Số điện thoại<span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          id="phoneNumber"
+          placeholder="Nhập số điện thoại"
+          variant="standard"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          fullWidth
+          style={{ marginBottom: "20px" }}
+        />
+      </Box>
       <Box
         sx={{
           position: "relative",
         }}
       >
+        <Typography fontSize="14px">
+          Mật khẩu<span style={{ color: "red" }}>*</span>
+        </Typography>
         <TextField
           id="password"
-          label="Mật khẩu"
+          placeholder="Nhập mật khẩu"
           type={showPassword}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -78,7 +86,7 @@ const Login = ({ handleLogin }) => {
             style={{
               position: "absolute",
               right: "10px",
-              top: "15px",
+              top: "20px",
               cursor: "pointer",
             }}
           />
@@ -88,7 +96,7 @@ const Login = ({ handleLogin }) => {
             style={{
               position: "absolute",
               right: "10px",
-              top: "15px",
+              top: "20px",
               cursor: "pointer",
             }}
           />

@@ -8,18 +8,18 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { io } from "socket.io-client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserAPI from "../api/UserAPI";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login, signup } from "../redux/userSlice";
 import Signup from "../components/Signup";
 import Login from "../components/Login";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import TokenAPI from "../api/TokenAPI";
+import connectSocket from "../utils/socketConfig";
 
 const style = {
   position: "absolute",
@@ -66,6 +66,7 @@ const Start = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [user, setUser] = useState({});
+  const socket = connectSocket();
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -78,7 +79,7 @@ const Start = () => {
     if (TokenAPI.getAccessToken() && TokenAPI.getRefreshToken()) {
       navigate("/home");
     }
-  }, [navigate]);
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -106,7 +107,6 @@ const Start = () => {
 
     const data = await UserAPI.login(phoneNumber, password);
     if (data) {
-      const socket = io(`${import.meta.env.VITE_REACT_APP_SOCKET_URL}`);
       socket.emit("login", data.user.id);
       dispatch(login(data));
 
@@ -169,7 +169,6 @@ const Start = () => {
     }
 
     const data = await UserAPI.signup(email, phoneNumber);
-    console.log(data);
     if (data) {
       setUser({ ...user, fullName, email, phoneNumber, password });
       handleOpen();
@@ -217,7 +216,6 @@ const Start = () => {
 
     if (data) {
       handleClose();
-      const socket = io(`${import.meta.env.EXPO_PUBLIC_SOCKET_URL}`);
       socket.emit("login", data.user.id);
       dispatch(signup(data));
       navigate("/home");
@@ -232,42 +230,58 @@ const Start = () => {
         component="section"
         sx={{
           display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
+          justifyContent: "center",
         }}
       >
         <Box
           component="div"
-          sx={{ textAlign: "center", marginTop: "30px", marginBottom: "20px" }}
+          sx={{ textAlign: "center", marginRight: "150px", marginTop: "100px" }}
         >
           <img
-            src="https://res.cloudinary.com/dthusmigo/image/upload/v1709463995/STORAGE/logo_mbm90e.png"
-            width="114"
-            height="41"
+            src="https://res.cloudinary.com/dthusmigo/image/upload/v1713187622/Chat_App_Logo_g4fw7f.png"
+            width="500"
+            height="500"
           />
         </Box>
-        <Typography textAlign="center">Đăng nhập tài khoản Zalo</Typography>
-        <Typography textAlign="center" marginBottom="20px">
-          Để kết nối với ứng dụng Zalo Web
-        </Typography>
-        <Box sx={{ width: "400px", boxShadow: "0px 0px 5px #ccc" }}>
-          <Box
-            sx={{
-              borderBottom: 1,
-              borderColor: "divider",
-            }}
+        <Box sx={{ marginTop: "50px" }}>
+          <Typography
+            textAlign="center"
+            marginBottom="10px"
+            fontWeight={"bold"}
+            fontSize={24}
           >
-            <Tabs value={value} onChange={handleChange}>
-              <Tab label="ĐĂNG NHẬP" {...a11yProps(0)} sx={{ width: "50%" }} />
-              <Tab label="ĐĂNG KÝ" {...a11yProps(1)} sx={{ width: "50%" }} />
-            </Tabs>
+            Đăng nhập tài khoản Jahoo!
+          </Typography>
+          <Typography
+            textAlign="center"
+            marginBottom="20px"
+            fontStyle={"italic"}
+          >
+            Để kết nối với ứng dụng Jahoo!
+          </Typography>
+          <Box sx={{ width: "500px", boxShadow: "0px 0px 5px #ccc" }}>
+            <Box
+              sx={{
+                borderBottom: 1,
+                borderColor: "divider",
+              }}
+            >
+              <Tabs value={value} onChange={handleChange}>
+                <Tab
+                  label="ĐĂNG NHẬP"
+                  {...a11yProps(0)}
+                  sx={{ width: "50%" }}
+                />
+                <Tab label="ĐĂNG KÝ" {...a11yProps(1)} sx={{ width: "50%" }} />
+              </Tabs>
+            </Box>
+            <CustomTabPanel value={value} index={0}>
+              <Login handleLogin={handleLogin} />
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={1}>
+              <Signup handleSignup={handleSignup} />
+            </CustomTabPanel>
           </Box>
-          <CustomTabPanel value={value} index={0}>
-            <Login handleLogin={handleLogin} />
-          </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
-            <Signup handleSignup={handleSignup} />
-          </CustomTabPanel>
         </Box>
       </Box>
       <Modal
@@ -301,7 +315,7 @@ const Start = () => {
             <CountdownCircleTimer
               key={key}
               isPlaying
-              duration={30}
+              duration={50}
               colors={["#004777", "#F7B801", "#A30000", "red"]}
               colorsTime={[20, 10, 5, 0]}
               strokeWidth={5}

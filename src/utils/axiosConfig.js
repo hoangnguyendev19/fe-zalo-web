@@ -29,23 +29,24 @@ axiosAuth.interceptors.response.use(
   async (error) => {
     const config = error.config;
     // Access Token was expired
-    if (error.response && error.response.status === 422 && !config._retry) {
+    if (error.response && error.response.status === 500 && !config._retry) {
       config._retry = true;
       try {
         const refresh_token = TokenAPI.getRefreshToken();
         console.log("refresh_token ->", refresh_token);
 
         if (refresh_token) {
-          const res = await axios({
+          const { data } = await axios({
             url: API_URL + "/api/v1/users/refresh-token",
             method: "post",
             data: {
               refreshToken: refresh_token,
             },
           });
-          if (res.data.accessToken) {
-            TokenAPI.setAccessToken(res.data.accessToken);
-            TokenAPI.setRefreshToken(res.data.refreshToken);
+
+          if (data.data) {
+            TokenAPI.setAccessToken(data.data.accessToken);
+            TokenAPI.setRefreshToken(data.data.refreshToken);
           }
           return axiosAuth(config);
         }

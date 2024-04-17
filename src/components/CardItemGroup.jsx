@@ -48,7 +48,9 @@ const CardItemGroup = ({ conver, setConversation }) => {
               textOverflow: "ellipsis",
             }}
           >
-            Toi dang an com
+            {admin?.fullName
+              ? `${admin?.fullName} đã gửi tin nhắn`
+              : "Nhóm chưa có tin nhắn"}
           </Typography>
         </Box>
       </ListItemButton>

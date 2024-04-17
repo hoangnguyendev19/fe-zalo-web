@@ -12,13 +12,14 @@ import {
   List,
   Avatar,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CardItemUser from "./CardItemUser";
 import UserAPI from "../api/UserAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../redux/userSlice";
+import { toast } from "react-toastify";
 
-export default function AddFriend() {
+export default function AddFriend({ socket }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [open, setOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
@@ -33,6 +34,82 @@ export default function AddFriend() {
     setFriend(null);
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_request_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+          setStatus("revoke");
+        } else if (data.status === "fail") {
+          toast.error(data.message);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("send_request_friend");
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_accept_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+          setStatus("friend");
+        } else if (data.status === "fail") {
+          toast.error(data.message);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("send_accept_friend");
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_revoke_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+          setStatus("request");
+        } else if (data.status === "fail") {
+          toast.error(data.message);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("send_revoke_friend");
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_delete_accept_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+          setStatus("request");
+        } else if (data.status === "fail") {
+          toast.error(data.message);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("send_delete_accept_friend");
+      }
+    };
+  }, [socket]);
 
   const handleSearchUser = async () => {
     const data = await UserAPI.getUserByPhoneNumber(phoneNumber);
@@ -55,34 +132,62 @@ export default function AddFriend() {
   };
 
   const handleRequestFriend = async () => {
-    const data = await UserAPI.requestFriend(friend.id);
-    if (data) {
-      dispatch(setUser(data));
-      setStatus("revoke");
+    // const data = await UserAPI.requestFriend(friend.id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    //   setStatus("revoke");
+    // }
+
+    if (socket) {
+      socket.emit("send_request_friend", {
+        senderId: user.id,
+        receiverId: friend.id,
+      });
     }
   };
 
   const handleRevokeFriend = async () => {
-    const data = await UserAPI.revokeFriend(friend.id);
-    if (data) {
-      dispatch(setUser(data));
-      setStatus("request");
+    // const data = await UserAPI.revokeFriend(friend.id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    //   setStatus("request");
+    // }
+
+    if (socket) {
+      socket.emit("send_revoke_friend", {
+        senderId: user.id,
+        receiverId: friend.id,
+      });
     }
   };
 
   const handleAcceptFriend = async () => {
-    const data = await UserAPI.acceptFriend(friend.id);
-    if (data) {
-      dispatch(setUser(data));
-      setStatus("friend");
+    // const data = await UserAPI.acceptFriend(friend.id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    //   setStatus("friend");
+    // }
+
+    if (socket) {
+      socket.emit("send_accept_friend", {
+        senderId: user.id,
+        receiverId: friend.id,
+      });
     }
   };
 
   const handleDeleteAcceptFriend = async () => {
-    const data = await UserAPI.deleteAcceptFriend(friend.id);
-    if (data) {
-      dispatch(setUser(data));
-      setStatus("request");
+    // const data = await UserAPI.deleteAcceptFriend(friend.id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    //   setStatus("request");
+    // }
+
+    if (socket) {
+      socket.emit("send_delete_accept_friend", {
+        senderId: user.id,
+        receiverId: friend.id,
+      });
     }
   };
 

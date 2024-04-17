@@ -13,6 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import ConversationAPI from "../api/ConversationAPI";
 import { addUser } from "../redux/conversationSlice";
 import { toast } from "react-toastify";
+import connectSocket from "../utils/socketConfig";
+import { useEffect } from "react";
 
 const style = {
   position: "absolute",
@@ -40,21 +42,49 @@ export default function AddMember({
 }) {
   const handleCloseModal = () => setOpenModal(false);
   const { user } = useSelector((state) => state.user);
+  const socket = connectSocket();
   const dispatch = useDispatch();
 
-  const handleAddMember = async (id) => {
-    const data = await ConversationAPI.addUserForConversation(
-      id,
-      conversation.id
-    );
-    if (data) {
-      dispatch(addUser({ conversationId: conversation.id, user: data }));
-      setConversation({
-        ...conversation,
-        members: [...conversation.members, data],
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_add_member", (data) => {
+        console.log("data: ", data);
+        if (data.status === "success") {
+          dispatch(addUser(data.data));
+          setConversation({
+            ...conversation,
+            members: [...conversation.members, data.data.user],
+          });
+          handleCloseModal();
+          toast.success("Bạn đã thêm thành viên thành công!");
+        } else if (data.status === "fail") {
+          toast.error("Thêm thành viên thất bại");
+        }
       });
-      handleCloseModal();
-      toast.success("Bạn đã thêm thành viên thành công!");
+    }
+  }, [socket]);
+
+  const handleAddMember = async (id) => {
+    // const data = await ConversationAPI.addUserForConversation(
+    //   id,
+    //   conversation.id
+    // );
+    // if (data) {
+    //   dispatch(addUser({ conversationId: conversation.id, user: data }));
+    //   setConversation({
+    //     ...conversation,
+    //     members: [...conversation.members, data],
+    //   });
+    //   handleCloseModal();
+    //   toast.success("Bạn đã thêm thành viên thành công!");
+    // }
+
+    if (socket) {
+      socket.emit("send_add_member", {
+        userId: id,
+        conversationId: conversation.id,
+        senderId: user.id,
+      });
     }
   };
 

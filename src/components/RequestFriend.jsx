@@ -14,10 +14,12 @@ import { useDispatch, useSelector } from "react-redux";
 import UserAPI from "../api/UserAPI";
 import { setUser } from "../redux/userSlice";
 import InforProfile from "./InforProfile";
+import connectSocket from "../utils/socketConfig";
 
 const RequestFriend = ({ handleOpenChat }) => {
   const { user } = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
+  const socket = connectSocket();
   const dispatch = useDispatch();
   const [openModalReceiver, setOpenModalReceiver] = useState(false);
   const [openModalSender, setOpenModalSender] = useState(false);
@@ -26,24 +28,99 @@ const RequestFriend = ({ handleOpenChat }) => {
     setOpen(!open);
   };
 
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_accept_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+        } else if (data.status === "fail") {
+          toast.error(data.message);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("send_accept_friend");
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_revoke_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+        } else if (data.status === "fail") {
+          toast.error(data.message);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("send_revoke_friend");
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_delete_accept_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+        } else if (data.status === "fail") {
+          toast.error(data.message);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("send_delete_accept_friend");
+      }
+    };
+  }, [socket]);
+
   const handleRevokeFriend = async (id) => {
-    const data = await UserAPI.revokeFriend(id);
-    if (data) {
-      dispatch(setUser(data));
+    // const data = await UserAPI.revokeFriend(id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    // }
+    console.log("id", id);
+    if (socket) {
+      socket.emit("send_revoke_friend", {
+        senderId: user.id,
+        receiverId: id,
+      });
     }
   };
 
   const handleAcceptFriend = async (id) => {
-    const data = await UserAPI.acceptFriend(id);
-    if (data) {
-      dispatch(setUser(data));
+    // const data = await UserAPI.acceptFriend(id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    // }
+
+    if (socket) {
+      socket.emit("send_accept_friend", {
+        senderId: user.id,
+        receiverId: id,
+      });
     }
   };
 
   const handleDeleteAcceptFriend = async (id) => {
-    const data = await UserAPI.deleteAcceptFriend(id);
-    if (data) {
-      dispatch(setUser(data));
+    // const data = await UserAPI.deleteAcceptFriend(id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    // }
+    console.log("id", id);
+    if (socket) {
+      socket.emit("send_delete_accept_friend", {
+        senderId: user.id,
+        receiverId: id,
+      });
     }
   };
 
@@ -151,7 +228,7 @@ const RequestFriend = ({ handleOpenChat }) => {
                               size="small"
                               color="error"
                               fullWidth
-                              onAbort={() =>
+                              onClick={() =>
                                 handleDeleteAcceptFriend(request.id)
                               }
                             >

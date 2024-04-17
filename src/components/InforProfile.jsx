@@ -23,6 +23,8 @@ import UserAPI from "../api/UserAPI";
 import { setUser } from "../redux/userSlice";
 import { toast } from "react-toastify";
 import ConversationAPI from "../api/ConversationAPI";
+import { io } from "socket.io-client";
+import connectSocket from "../utils/socketConfig";
 
 const style = {
   position: "absolute",
@@ -317,13 +319,35 @@ function Info({ gender, dateOfBirth, phoneNumber, email }) {
 function AnotherFunctions({ changeBody, userInfo, handleCloseModal }) {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const socket = connectSocket();
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("send_delete_friend", (data) => {
+        if (data.status === "success") {
+          dispatch(setUser(data.data));
+          handleCloseModal();
+          toast.success("Bạn đã xoá bạn bè thành công!");
+        } else if (data.status === "fail") {
+          toast.error("Bạn đã xoá bạn bè thất bại!");
+        }
+      });
+    }
+  }, [socket]);
 
   const handleDeleteFriend = async () => {
-    const data = await UserAPI.deleteFriend(userInfo.id);
-    if (data) {
-      dispatch(setUser(data));
-      handleCloseModal();
-      toast.success("Bạn đã xoá bạn bè thành công!");
+    // const data = await UserAPI.deleteFriend(userInfo.id);
+    // if (data) {
+    //   dispatch(setUser(data));
+    //   handleCloseModal();
+    //   toast.success("Bạn đã xoá bạn bè thành công!");
+    // }
+
+    if (socket) {
+      socket.emit("send_delete_friend", {
+        senderId: user.id,
+        receiverId: userInfo.id,
+      });
     }
   };
   return (

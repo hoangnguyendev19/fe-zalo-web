@@ -20,6 +20,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import ConversationAPI from "../api/ConversationAPI";
 import { getAllConversations } from "../redux/conversationSlice";
+import connectSocket from "../utils/socketConfig";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -51,6 +52,7 @@ const Messager = () => {
   const { conversations } = useSelector((state) => state.conversation);
   const [conversation, setConversation] = useState(null);
   const dispatch = useDispatch();
+  const socket = connectSocket();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -92,10 +94,10 @@ const Messager = () => {
             fullWidth
           />
           <Box sx={{ marginLeft: "5px" }}>
-            <AddFriend />
+            <AddFriend socket={socket} />
           </Box>
           <Box sx={{ marginLeft: "5px" }}>
-            <CreateGroup />
+            <CreateGroup socket={socket} />
           </Box>
         </Box>
         <Box sx={{ width: "100%", marginTop: "10px" }}>
@@ -152,7 +154,11 @@ const Messager = () => {
         }}
       >
         {conversation ? (
-          <Chat conversation={conversation} setConversation={setConversation} />
+          <Chat
+            conversation={conversation}
+            setConversation={setConversation}
+            socket={socket}
+          />
         ) : (
           <Box sx={{ marginTop: "100px" }}>
             <Carousel
