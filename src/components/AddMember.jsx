@@ -48,7 +48,6 @@ export default function AddMember({
   useEffect(() => {
     if (socket) {
       socket.on("send_add_member", (data) => {
-        console.log("data: ", data);
         if (data.status === "success") {
           dispatch(addUser(data.data));
           setConversation({

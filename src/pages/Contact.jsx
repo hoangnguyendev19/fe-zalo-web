@@ -33,7 +33,6 @@ const Contact = () => {
   useEffect(() => {
     if (socket) {
       socket.on("send_create_conversation", (data) => {
-        console.log(data);
         if (data.status === "success") {
           dispatch(createConversation(data.data));
           setConversation(data.data);

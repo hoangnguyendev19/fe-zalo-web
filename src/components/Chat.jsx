@@ -41,6 +41,8 @@ import CircleIcon from "@mui/icons-material/Circle";
 import PersonIcon from "@mui/icons-material/Person";
 import connectSocket from "../utils/socketConfig";
 
+const TYPING_DELAY = 5000; // Adjust the delay as needed
+
 const Chat = ({ conversation, setConversation }) => {
   const { name, members, admin, type, id } = conversation;
   const { user } = useSelector((state) => state.user);
@@ -51,6 +53,7 @@ const Chat = ({ conversation, setConversation }) => {
   const [online, isOnline] = useState(false);
   const [typing, setTyping] = useState(false);
   const [userTyping, setUserTyping] = useState("");
+  let typingTimer = null;
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -128,9 +131,11 @@ const Chat = ({ conversation, setConversation }) => {
   const handleGroupItemClick = async (index) => {
     if (index === 0) {
       setOpenAddMember(true);
+      return;
     }
     if (index === 2) {
       setOpenGroupMember(true);
+      return;
     }
 
     if (index === 3) {
@@ -138,12 +143,6 @@ const Chat = ({ conversation, setConversation }) => {
         toast.warning(
           "Trước khi rời khỏi, bạn cần trao quyền trưởng nhóm cho người khác!"
         );
-        return;
-      }
-
-      if (conversation.members.length === 3) {
-        handleDeleteConversation();
-        toast.success("Bạn đã rời khỏi nhóm thành công!");
         return;
       }
 
@@ -326,21 +325,6 @@ const Chat = ({ conversation, setConversation }) => {
     }
   }, [conversation]);
 
-  // useEffect(() => {
-  //   const newSocket = io(`${import.meta.env.VITE_REACT_APP_SOCKET_URL}`);
-  //   newSocket.emit("join_room", {
-  //     conversationId: conversation.id,
-  //     userId: user.id,
-  //   });
-  //   setSocket(newSocket);
-
-  //   return () => {
-  //     if (newSocket) {
-  //       newSocket.disconnect();
-  //     }
-  //   };
-  // }, []);
-
   useEffect(() => {
     if (socket) {
       socket.emit("join_room", {
@@ -374,8 +358,10 @@ const Chat = ({ conversation, setConversation }) => {
   useEffect(() => {
     if (socket) {
       socket.on("typing", (fullName) => {
-        setTyping(true);
-        setUserTyping(fullName);
+        setTyping(fullName !== "");
+        if (fullName !== "") {
+          setUserTyping(fullName);
+        }
       });
     }
 
@@ -459,7 +445,7 @@ const Chat = ({ conversation, setConversation }) => {
   const handleSendMessage = () => {
     const message = {
       content,
-      type: typeMsg,
+      type: "TEXT",
       conversationId: conversation.id,
       senderId: user.id,
     };
@@ -541,14 +527,31 @@ const Chat = ({ conversation, setConversation }) => {
     }
   };
 
-  const handleTyping = (event) => {
+  const handleChange = (event) => {
     setContent(event.target.value);
-    if (socket) {
-      socket.emit("typing", {
+    if (!typing) {
+      handleTypingStart();
+    }
+
+    handleTypingEnd();
+  };
+
+  const handleTypingStart = () => {
+    socket.emit("typing_start", {
+      conversationId: conversation?.id,
+      userId: user?.id,
+    });
+    clearTimeout(typingTimer); // Clear any existing timer
+  };
+
+  const handleTypingEnd = () => {
+    typingTimer = setTimeout(() => {
+      socket.emit("typing_end", {
         conversationId: conversation?.id,
         userId: user?.id,
       });
-    }
+      setTyping(false);
+    }, TYPING_DELAY);
   };
 
   return (
@@ -672,12 +675,22 @@ const Chat = ({ conversation, setConversation }) => {
             })}
         </Box>
       </Box>
-      <Box>
-        {typing && (
-          <Typography
-            sx={{ color: "gray", padding: "0px 10px" }}
-          >{`${userTyping} đang nhập tin nhắn...`}</Typography>
-        )}
+      <Box sx={{ position: "relative" }}>
+        <Box
+          sx={{
+            backgroundColor: "#ccc",
+            position: "absolute",
+            top: "-30px",
+            left: "0px",
+            right: "0px",
+          }}
+        >
+          {typing && (
+            <Typography
+              sx={{ color: "#0091ff", padding: "0px 10px" }}
+            >{`${userTyping} đang nhập tin nhắn...`}</Typography>
+          )}
+        </Box>
         <Box sx={{ display: "flex", alignItems: "center", padding: "5px 0" }}>
           <Box sx={{ padding: "0px 20px" }}>
             <label htmlFor="uploadImg">
@@ -710,7 +723,8 @@ const Chat = ({ conversation, setConversation }) => {
             variant="outlined"
             fullWidth
             value={content}
-            onChange={(e) => handleTyping(e)}
+            onChange={handleChange}
+            on
           />
           <Button
             size="large"

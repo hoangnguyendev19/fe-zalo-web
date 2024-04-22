@@ -6,9 +6,23 @@ import {
   ListItemButton,
   Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
+import MessageAPI from "../api/MessageAPI";
 
 const CardItemGroup = ({ conver, setConversation }) => {
   let { name, members, admin, type, id } = conver;
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await MessageAPI.getLatestMessageForConversation(id);
+      if (data) {
+        setMessage(data);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <ListItem sx={{ padding: "0px" }}>
@@ -48,9 +62,11 @@ const CardItemGroup = ({ conver, setConversation }) => {
               textOverflow: "ellipsis",
             }}
           >
-            {admin?.fullName
-              ? `${admin?.fullName} đã gửi tin nhắn`
-              : "Nhóm chưa có tin nhắn"}
+            {message
+              ? message.type === "TEXT"
+                ? `${message.senderId.fullName}: ${message.content}`
+                : `${message.senderId.fullName}: đã gửi một file đính kèm`
+              : "Tin nhắn chưa có"}
           </Typography>
         </Box>
       </ListItemButton>

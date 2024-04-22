@@ -28,6 +28,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ChangePassword from "../components/ChangePassword";
 import {
+  addUser,
+  assignAdmin,
   createConversation,
   deleteConversation,
   removeUser,
@@ -37,19 +39,6 @@ import connectSocket from "../utils/socketConfig";
 const Messager = lazy(() => import("./Messager"));
 const Contact = lazy(() => import("./Contact"));
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  // border: "1px solid #000",
-  borderRadius: 5,
-  // boxShadow: 24,
-  p: 4,
-};
-
 const Home = () => {
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -58,10 +47,8 @@ const Home = () => {
 
   const [showMess, setShowMess] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const isOpen = Boolean(anchorEl);
-  const id = isOpen ? "simple-popover" : undefined;
-
-  const [open, setOpen] = useState(false);
+  const open = Boolean(anchorEl);
+  const id = open ? "simple-popover" : undefined;
 
   useEffect(() => {
     if (!user) {
@@ -77,8 +64,8 @@ const Home = () => {
   }, [user]);
 
   useEffect(() => {
-    if (socket && socket.connected) {
-      setOpen(true);
+    if (socket && socket.disconnected) {
+      socket.connect();
     }
   }, [socket]);
 
@@ -149,7 +136,7 @@ const Home = () => {
         if (data.code === "receive_assign_admin") {
           dispatch(assignAdmin(data.data));
           toast.info(
-            `Trưởng nhóm đã trao quyền trưởng nhóm cho ${data.member} trong nhóm ${data.name}`
+            `Trưởng nhóm đã trao cho ${data.member} làm trưởng nhóm của nhóm ${data.name}`
           );
           return;
         }
@@ -161,11 +148,21 @@ const Home = () => {
           );
         }
 
+        if (data.code === "receive_leave_group") {
+          dispatch(deleteConversation(data.data));
+          toast.info(`Trưởng nhóm đã xoá bạn khỏi nhóm ${data.name}`);
+        }
+
         if (data.code === "receive_add_member") {
           dispatch(addUser(data.data));
           toast.info(
             `${data.sender} đã thêm ${data.member} vào nhóm ${data.name}`
           );
+        }
+
+        if (data.code === "receive_join_group") {
+          dispatch(createConversation(data.data));
+          toast.info(`${data.sender} đã mời bạn tham gia nhóm ${data.name}`);
         }
       });
     }
@@ -266,7 +263,7 @@ const Home = () => {
                 <ListItemIcon>
                   <Popover
                     id={id}
-                    open={isOpen}
+                    open={open}
                     anchorEl={anchorEl}
                     onClose={handleClose}
                     anchorOrigin={{
@@ -304,47 +301,6 @@ const Home = () => {
           </Grid>
           {showMess ? <Messager /> : <Contact />}
         </Grid>
-        <Modal
-          open={open}
-          onClose={() => setOpen(false)}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style}>
-            <Typography
-              id="modal-modal-title"
-              variant="h6"
-              component="h2"
-              fontWeight="600"
-            >
-              Bạn có muốn kết nối lại không ?
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                marginTop: "20px",
-              }}
-            >
-              <Button
-                style={{ marginLeft: "auto", marginRight: "10px" }}
-                variant="outlined"
-                onClick={() => setOpen(false)}
-              >
-                Huỷ
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  socket.connect();
-                  setOpen(false);
-                }}
-              >
-                Kết nối
-              </Button>
-            </Box>
-          </Box>
-        </Modal>
       </Box>
       <ToastContainer />
     </Suspense>
