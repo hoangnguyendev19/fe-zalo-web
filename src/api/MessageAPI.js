@@ -1,8 +1,22 @@
-import { axiosAuth } from '../utils/axiosConfig';
+import { axiosAuth } from "../utils/axiosConfig";
 
 const getAllMessageForConversation = async (conversationId) => {
   try {
-    const { data } = await axiosAuth.get(`/api/v1/messages?conversation=${conversationId}`);
+    const { data } = await axiosAuth.get(
+      `/api/v1/messages?conversation=${conversationId}`
+    );
+
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getLatestMessageForConversation = async (conversationId) => {
+  try {
+    const { data } = await axiosAuth.get(
+      `/api/v1/messages/latest?conversation=${conversationId}`
+    );
 
     return data.data;
   } catch (error) {
@@ -12,7 +26,7 @@ const getAllMessageForConversation = async (conversationId) => {
 
 const createMessage = async (message) => {
   try {
-    const { data } = await axiosAuth.post('/api/v1/messages', message);
+    const { data } = await axiosAuth.post("/api/v1/messages", message);
 
     return data.data;
   } catch (error) {
@@ -30,5 +44,10 @@ const revokeMessage = async (messageId) => {
   }
 };
 
-const MessageAPI = { getAllMessageForConversation, createMessage, revokeMessage };
+const MessageAPI = {
+  getAllMessageForConversation,
+  getLatestMessageForConversation,
+  createMessage,
+  revokeMessage,
+};
 export default MessageAPI;

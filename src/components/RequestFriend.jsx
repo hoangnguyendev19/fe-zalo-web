@@ -87,7 +87,6 @@ const RequestFriend = ({ handleOpenChat }) => {
     // if (data) {
     //   dispatch(setUser(data));
     // }
-    console.log("id", id);
     if (socket) {
       socket.emit("send_revoke_friend", {
         senderId: user.id,
@@ -115,7 +114,6 @@ const RequestFriend = ({ handleOpenChat }) => {
     // if (data) {
     //   dispatch(setUser(data));
     // }
-    console.log("id", id);
     if (socket) {
       socket.emit("send_delete_accept_friend", {
         senderId: user.id,
