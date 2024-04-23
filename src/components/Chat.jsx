@@ -103,12 +103,6 @@ const Chat = ({ conversation, setConversation }) => {
   }, [socket]);
 
   const handleDeleteConversation = async () => {
-    // const data = await ConversationAPI.deleteConversation(conversation.id);
-    // if (data) {
-    //   dispatch(deleteConversation(conversation.id));
-    //   setConversation(null);
-    // }
-
     if (socket) {
       socket.emit("send_delete_group", id);
     }
@@ -145,15 +139,6 @@ const Chat = ({ conversation, setConversation }) => {
         );
         return;
       }
-
-      // const data = await ConversationAPI.removeYourselfForConversation(
-      //   conversation.id
-      // );
-      // if (data) {
-      //   dispatch(removeYourself(conversation.id));
-      //   setConversation(null);
-      //   toast.success("Bạn đã rời khỏi nhóm thành công!");
-      // }
 
       if (socket) {
         socket.emit("send_remove_yourself", {

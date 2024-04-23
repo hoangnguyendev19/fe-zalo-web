@@ -11,11 +11,9 @@ import {
 
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
-import ConversationAPI from "../api/ConversationAPI";
 import { assignAdmin, removeUser } from "../redux/conversationSlice";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { toast } from "react-toastify";
-import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { useEffect, useState } from "react";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -100,17 +98,6 @@ export default function GroupMember({
   }, [socket]);
 
   const handleAssignAdmin = async (id) => {
-    // const data = await ConversationAPI.assignAdminForConversation(
-    //   id,
-    //   conversation.id
-    // );
-    // if (data) {
-    //   dispatch(assignAdmin({ conversationId: conversation.id, userId: id }));
-    //   setConversation({ ...conversation, admin: id });
-    //   handleCloseModal();
-    //   toast.success("Bạn đã trao quyền trưởng nhóm thành công!");
-    // }
-
     if (socket) {
       socket.emit("send_assign_admin", {
         conversationId: conversation.id,
@@ -124,20 +111,6 @@ export default function GroupMember({
       toast.warning("Nhóm phải có ít nhất 3 thành viên");
       return;
     }
-
-    // const data = await ConversationAPI.removeUserForConversation(
-    //   id,
-    //   conversation.id
-    // );
-    // if (data) {
-    //   dispatch(removeUser({ conversationId: conversation.id, userId: id }));
-    //   setConversation({
-    //     ...conversation,
-    //     members: conversation.members.filter((mem) => mem.id !== id),
-    //   });
-    //   handleCloseModal();
-    //   toast.success("Bạn đã xóa thành viên khỏi nhóm thành công!");
-    // }
 
     if (socket) {
       socket.emit("send_remove_member", {

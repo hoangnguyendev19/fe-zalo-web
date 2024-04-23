@@ -1,30 +1,29 @@
 import {
-  Modal,
-  IconButton,
-  Typography,
+  Avatar,
+  AvatarGroup,
   Box,
+  Grid,
+  IconButton,
   List,
   ListItemButton,
-  Avatar,
-  Grid,
-  AvatarGroup,
+  Modal,
+  Typography,
 } from "@mui/material";
 
-import CloseIcon from "@mui/icons-material/Close";
-import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import ModalImage from "./ModalImage";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convertToDate } from "../utils/handler";
-import UserAPI from "../api/UserAPI";
-import { setUser } from "../redux/userSlice";
 import { toast } from "react-toastify";
 import ConversationAPI from "../api/ConversationAPI";
-import { io } from "socket.io-client";
+import UserAPI from "../api/UserAPI";
+import { setUser } from "../redux/userSlice";
+import { convertToDate } from "../utils/handler";
 import connectSocket from "../utils/socketConfig";
+import ModalImage from "./ModalImage";
 
 const style = {
   position: "absolute",

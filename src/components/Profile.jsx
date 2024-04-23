@@ -1,35 +1,35 @@
 import {
-  Modal,
-  Button,
-  IconButton,
-  Typography,
-  Box,
-  ListItemButton,
   Avatar,
   Badge,
-  Grid,
-  Slider,
+  Box,
+  Button,
   CircularProgress,
+  Grid,
+  IconButton,
+  ListItemButton,
+  Modal,
+  Slider,
+  Typography,
 } from "@mui/material";
 
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
+import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import CameraEnhanceOutlinedIcon from "@mui/icons-material/CameraEnhanceOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
-import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import ModalImage from "./ModalImage";
-import { useEffect, useState, useRef, memo, useLayoutEffect } from "react";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { useDispatch, useSelector } from "react-redux";
+import UploadAPI from "../api/UploadAPI";
+import UserAPI from "../api/UserAPI";
+import { setUser } from "../redux/userSlice";
 import {
   convertDateToDateObj,
   convertToDate,
   convertToDateTime,
 } from "../utils/handler";
-import UserAPI from "../api/UserAPI";
-import UploadAPI from "../api/UploadAPI";
-import { setUser } from "../redux/userSlice";
+import ModalImage from "./ModalImage";
 
 const style = {
   position: "absolute",

@@ -1,24 +1,23 @@
+import DraftsOutlinedIcon from "@mui/icons-material/DraftsOutlined";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
+  Button,
   Grid,
   InputAdornment,
   TextField,
-  Button,
   Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import DraftsOutlinedIcon from "@mui/icons-material/DraftsOutlined";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import AddFriend from "../components/AddFriend";
+import Chat from "../components/Chat";
+import CreateGroup from "../components/CreateGroup";
 import ListFriend from "../components/ListFriend";
 import ListGroup from "../components/ListGroup";
 import RequestFriend from "../components/RequestFriend";
-import AddFriend from "../components/AddFriend";
-import CreateGroup from "../components/CreateGroup";
-import Chat from "../components/Chat";
-import { useDispatch, useSelector } from "react-redux";
-import ConversationAPI from "../api/ConversationAPI";
 import { createConversation } from "../redux/conversationSlice";
 import connectSocket from "../utils/socketConfig";
 
@@ -60,11 +59,6 @@ const Contact = () => {
         members: [user.id, id],
         admin: user.id,
       };
-      // const data = await ConversationAPI.createConversation(newConver);
-      // if (data) {
-      //   dispatch(createConversation(data));
-      //   setConversation(data);
-      // }
 
       if (socket) {
         socket.emit("send_create_conversation", newConver);

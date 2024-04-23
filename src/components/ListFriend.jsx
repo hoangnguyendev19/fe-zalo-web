@@ -1,24 +1,24 @@
-import { useState } from "react";
-import {
-  Box,
-  Typography,
-  Stack,
-  TextField,
-  InputAdornment,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemAvatar,
-  Avatar,
-  IconButton,
-} from "@mui/material";
+import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
+import {
+  Avatar,
+  Box,
+  IconButton,
+  InputAdornment,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import InforProfile from "./InforProfile";
-import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 
 const ListFriend = ({ handleOpenChat }) => {
   const { user } = useSelector((state) => state.user);
@@ -28,14 +28,6 @@ const ListFriend = ({ handleOpenChat }) => {
   let currentAlphabet = "";
   const [openModal, setOpenModal] = useState(false);
   const [friend, setFriend] = useState(null);
-
-  // const handleClick = (event) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
 
   const handleOpenProfile = (fri) => {
     setFriend(fri);
