@@ -25,7 +25,7 @@ export default function AddFriend({ socket }) {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [friend, setFriend] = useState(null);
-  const [status, setStatus] = useState("request"); // request - accept - revoke - friend
+  const [status, setStatus] = useState("request");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -132,12 +132,6 @@ export default function AddFriend({ socket }) {
   };
 
   const handleRequestFriend = async () => {
-    // const data = await UserAPI.requestFriend(friend.id);
-    // if (data) {
-    //   dispatch(setUser(data));
-    //   setStatus("revoke");
-    // }
-
     if (socket) {
       socket.emit("send_request_friend", {
         senderId: user.id,
@@ -147,12 +141,6 @@ export default function AddFriend({ socket }) {
   };
 
   const handleRevokeFriend = async () => {
-    // const data = await UserAPI.revokeFriend(friend.id);
-    // if (data) {
-    //   dispatch(setUser(data));
-    //   setStatus("request");
-    // }
-
     if (socket) {
       socket.emit("send_revoke_friend", {
         senderId: user.id,
@@ -162,12 +150,6 @@ export default function AddFriend({ socket }) {
   };
 
   const handleAcceptFriend = async () => {
-    // const data = await UserAPI.acceptFriend(friend.id);
-    // if (data) {
-    //   dispatch(setUser(data));
-    //   setStatus("friend");
-    // }
-
     if (socket) {
       socket.emit("send_accept_friend", {
         senderId: user.id,
@@ -177,12 +159,6 @@ export default function AddFriend({ socket }) {
   };
 
   const handleDeleteAcceptFriend = async () => {
-    // const data = await UserAPI.deleteAcceptFriend(friend.id);
-    // if (data) {
-    //   dispatch(setUser(data));
-    //   setStatus("request");
-    // }
-
     if (socket) {
       socket.emit("send_delete_accept_friend", {
         senderId: user.id,

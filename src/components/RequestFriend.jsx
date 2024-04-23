@@ -1,20 +1,19 @@
+import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
+import DraftsOutlinedIcon from "@mui/icons-material/DraftsOutlined";
 import {
   Avatar,
   Box,
   Button,
-  IconButton,
   Grid,
+  IconButton,
   Stack,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import DraftsOutlinedIcon from "@mui/icons-material/DraftsOutlined";
-import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import UserAPI from "../api/UserAPI";
 import { setUser } from "../redux/userSlice";
-import InforProfile from "./InforProfile";
 import connectSocket from "../utils/socketConfig";
+import InforProfile from "./InforProfile";
 
 const RequestFriend = ({ handleOpenChat }) => {
   const { user } = useSelector((state) => state.user);
@@ -83,10 +82,6 @@ const RequestFriend = ({ handleOpenChat }) => {
   }, [socket]);
 
   const handleRevokeFriend = async (id) => {
-    // const data = await UserAPI.revokeFriend(id);
-    // if (data) {
-    //   dispatch(setUser(data));
-    // }
     if (socket) {
       socket.emit("send_revoke_friend", {
         senderId: user.id,
@@ -96,11 +91,6 @@ const RequestFriend = ({ handleOpenChat }) => {
   };
 
   const handleAcceptFriend = async (id) => {
-    // const data = await UserAPI.acceptFriend(id);
-    // if (data) {
-    //   dispatch(setUser(data));
-    // }
-
     if (socket) {
       socket.emit("send_accept_friend", {
         senderId: user.id,
@@ -110,10 +100,6 @@ const RequestFriend = ({ handleOpenChat }) => {
   };
 
   const handleDeleteAcceptFriend = async (id) => {
-    // const data = await UserAPI.deleteAcceptFriend(id);
-    // if (data) {
-    //   dispatch(setUser(data));
-    // }
     if (socket) {
       socket.emit("send_delete_accept_friend", {
         senderId: user.id,

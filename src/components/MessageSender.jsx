@@ -1,11 +1,11 @@
+import DescriptionIcon from "@mui/icons-material/Description";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { Box, Button, Modal, Popover, Typography } from "@mui/material";
 import { useState } from "react";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { convertToTime } from "../utils/handler";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import DescriptionIcon from "@mui/icons-material/Description";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 const MessageSender = ({ message, handleRevokeMessage }) => {
   const { content, type, isRevoked, createdAt, likes, id } = message;

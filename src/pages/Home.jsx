@@ -1,32 +1,29 @@
-import * as React from "react";
+import ChatIcon from "@mui/icons-material/Chat";
+import ContactsIcon from "@mui/icons-material/Contacts";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
 import {
   Avatar,
   Box,
-  Button,
   Grid,
   List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemIcon,
-  Modal,
   Popover,
   Typography,
 } from "@mui/material";
-import ChatIcon from "@mui/icons-material/Chat";
-import ContactsIcon from "@mui/icons-material/Contacts";
-import SettingsIcon from "@mui/icons-material/Settings";
-import { useState, lazy, Suspense, useEffect } from "react";
-import LogoutIcon from "@mui/icons-material/Logout";
-import Loading from "../components/Loading";
-import Profile from "../components/Profile";
-import { connect, useDispatch, useSelector } from "react-redux";
-import UserAPI from "../api/UserAPI";
-import { logout, setUser } from "../redux/userSlice";
+import * as React from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import UserAPI from "../api/UserAPI";
 import ChangePassword from "../components/ChangePassword";
+import Loading from "../components/Loading";
+import Profile from "../components/Profile";
 import {
   addUser,
   assignAdmin,
@@ -34,6 +31,7 @@ import {
   deleteConversation,
   removeUser,
 } from "../redux/conversationSlice";
+import { logout, setUser } from "../redux/userSlice";
 import connectSocket from "../utils/socketConfig";
 
 const Messager = lazy(() => import("./Messager"));
@@ -60,6 +58,10 @@ const Home = () => {
       };
 
       fetchData();
+    } else {
+      if (user.isAdmin) {
+        navigate("/admin");
+      }
     }
   }, [user]);
 

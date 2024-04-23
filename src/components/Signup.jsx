@@ -1,7 +1,7 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { useState } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 
 const Signup = ({ handleSignup }) => {
   const [fullName, setFullName] = useState("");

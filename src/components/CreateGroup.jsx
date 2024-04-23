@@ -18,7 +18,6 @@ import {
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import ConversationAPI from "../api/ConversationAPI";
 import { createConversation } from "../redux/conversationSlice";
 
 export default function CreateGroup({ socket }) {
@@ -68,15 +67,6 @@ export default function CreateGroup({ socket }) {
       type: "GROUP",
     };
 
-    // const data = await ConversationAPI.createConversation(conver);
-    // if (data) {
-    //   dispatch(createConversation(data));
-    //   toast.success("Tạo nhóm thành công");
-    //   setName("");
-    //   setOpen(false);
-    // } else {
-    //   toast.error("Tạo nhóm thất bại");
-    // }
     if (socket) {
       socket.emit("send_create_group", conver);
     }

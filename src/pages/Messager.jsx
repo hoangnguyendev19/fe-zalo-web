@@ -1,24 +1,24 @@
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Grid,
   InputAdornment,
+  List,
   Tab,
   Tabs,
   TextField,
-  List,
   Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import CardItemUser from "../components/CardItemUser";
-import CardItemGroup from "../components/CardItemGroup";
-import AddFriend from "../components/AddFriend";
-import CreateGroup from "../components/CreateGroup";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Chat from "../components/Chat";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import ConversationAPI from "../api/ConversationAPI";
+import AddFriend from "../components/AddFriend";
+import CardItemGroup from "../components/CardItemGroup";
+import CardItemUser from "../components/CardItemUser";
+import Chat from "../components/Chat";
+import CreateGroup from "../components/CreateGroup";
 import { getAllConversations } from "../redux/conversationSlice";
 import connectSocket from "../utils/socketConfig";
 

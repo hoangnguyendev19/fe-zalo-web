@@ -64,20 +64,6 @@ export default function AddMember({
   }, [socket]);
 
   const handleAddMember = async (id) => {
-    // const data = await ConversationAPI.addUserForConversation(
-    //   id,
-    //   conversation.id
-    // );
-    // if (data) {
-    //   dispatch(addUser({ conversationId: conversation.id, user: data }));
-    //   setConversation({
-    //     ...conversation,
-    //     members: [...conversation.members, data],
-    //   });
-    //   handleCloseModal();
-    //   toast.success("Bạn đã thêm thành viên thành công!");
-    // }
-
     if (socket) {
       socket.emit("send_add_member", {
         userId: id,

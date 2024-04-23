@@ -1,26 +1,26 @@
-import { useEffect, useState } from "react";
+import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
+import EastIcon from "@mui/icons-material/East";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import SearchIcon from "@mui/icons-material/Search";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 import {
-  Box,
-  Typography,
-  Stack,
-  TextField,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemAvatar,
-  Divider,
   Avatar,
   AvatarGroup,
+  Box,
+  Divider,
   IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import EastIcon from "@mui/icons-material/East";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 
 const ListGroup = ({ handleOpenChat }) => {
   const { conversations } = useSelector((state) => state.conversation);

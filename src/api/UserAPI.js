@@ -196,6 +196,48 @@ const deleteFriend = async (userId) => {
   }
 };
 
+// Admin
+
+const getAllUsers = async () => {
+  try {
+    const { data } = await axiosAuth.get("/api/v1/users/admin");
+
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const createUser = async (user) => {
+  try {
+    const { data } = await axiosAuth.post("/api/v1/users/admin", user);
+
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateUser = async (userId, user) => {
+  try {
+    const { data } = await axiosAuth.put(`/api/v1/users/admin/${userId}`, user);
+
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteUser = async (userId) => {
+  try {
+    const { data } = await axiosAuth.delete(`/api/v1/users/admin/${userId}`);
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const UserAPI = {
   signup,
   verifyOtp,
@@ -212,6 +254,10 @@ const UserAPI = {
   deleteAcceptFriend,
   revokeFriend,
   deleteFriend,
+  getAllUsers,
+  createUser,
+  updateUser,
+  deleteUser,
 };
 
 export default UserAPI;

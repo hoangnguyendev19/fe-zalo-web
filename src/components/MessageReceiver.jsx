@@ -1,10 +1,10 @@
-import { Avatar, Box, Button, Modal, Typography } from "@mui/material";
-import { convertToTime } from "../utils/handler";
+import DescriptionIcon from "@mui/icons-material/Description";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { Avatar, Box, Button, Modal, Typography } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import DescriptionIcon from "@mui/icons-material/Description";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { convertToTime } from "../utils/handler";
 
 const MessageReceiver = ({
   message,
